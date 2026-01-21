@@ -1,7 +1,8 @@
 import { Head, router } from '@inertiajs/react';
+import { CheckCircle } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle } from 'lucide-react';
 
 export default function Onboarding() {
     const completeOnboarding = () => {

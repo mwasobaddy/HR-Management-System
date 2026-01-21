@@ -43,7 +43,17 @@ class PublicController extends Controller
     {
         $plans = SubscriptionPlan::where('is_active', true)
             ->orderBy('price_monthly')
-            ->get();
+            ->get()
+            ->map(function ($plan) {
+                return [
+                    'id' => $plan->id,
+                    'name' => $plan->name,
+                    'price' => number_format($plan->price_monthly, 2),
+                    'billing_cycle' => 'month',
+                    'max_users' => $plan->max_users,
+                    'features' => $plan->features,
+                ];
+            });
 
         return Inertia::render('unauth/pricing', [
             'plans' => $plans,

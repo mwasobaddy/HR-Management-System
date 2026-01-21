@@ -28,14 +28,8 @@ interface PricingProps {
 export default function Pricing({ plans }: PricingProps) {
     const [pricingCycle, setPricingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
-    const handleSelectPlan = (planSlug: string) => {
-        if (planSlug === 'free') {
-            // Redirect to registration for free plan
-            router.visit('/register');
-        } else {
-            // TODO: Implement payment processing
-            alert('Payment processing will be implemented in Phase 2');
-        }
+    const handleSelectPlan = (planId: number) => {
+        router.visit(`/subscribe?plan=${planId}`);
     };
 
     return (
@@ -183,11 +177,11 @@ export default function Pricing({ plans }: PricingProps) {
                                     </ul>
 
                                     <Button
-                                        onClick={() => handleSelectPlan(plan.slug)}
+                                        onClick={() => handleSelectPlan(plan.id)}
                                         className="mt-8 w-full"
                                         variant={isPopular ? 'default' : 'outline'}
                                     >
-                                        {plan.slug === 'free' ? 'Start Free' : 'Select Plan'}
+                                        {plan.slug === 'free' ? 'Start Free Trial' : 'Get Started'}
                                     </Button>
                                 </div>
                             );

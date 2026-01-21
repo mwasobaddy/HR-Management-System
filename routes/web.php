@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Unauth\PublicController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -11,6 +12,10 @@ Route::get('/', [PublicController::class, 'home'])->name('home');
 Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
 Route::get('/demo', [PublicController::class, 'demo'])->name('demo');
 Route::get('/support', [PublicController::class, 'support'])->name('support');
+
+// Subscription flow (public)
+Route::get('/subscribe', [SubscriptionController::class, 'show'])->name('subscribe');
+Route::post('/subscribe', [SubscriptionController::class, 'store'])->name('subscribe.store');
 
 // Authenticated routes
 Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
