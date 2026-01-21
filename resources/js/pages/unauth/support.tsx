@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 export default function Support() {
     const [submitted, setSubmitted] = useState(false);
     
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, processing } = useForm({
         name: '',
         email: '',
         subject: '',
