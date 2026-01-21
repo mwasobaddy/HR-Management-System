@@ -73,7 +73,3 @@ class WelcomeCredentials extends Notification implements ShouldQueue
         ];
     }
 }
-            //
-        ];
-    }
-}

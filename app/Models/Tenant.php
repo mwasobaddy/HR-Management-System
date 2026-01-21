@@ -7,10 +7,11 @@ use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\DatabaseConfig;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
-    use HasDatabase, HasDomains;
+    use HasDatabase, HasDomains, HasFactory;
 
     /**
      * The attributes that should be cast.

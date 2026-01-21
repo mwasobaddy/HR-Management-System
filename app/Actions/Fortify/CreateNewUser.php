@@ -28,7 +28,14 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
+        // Create a default tenant for the user
+        $tenant = \App\Models\Tenant::create([
+            'name' => $input['name'] . "'s Organization",
+            'domain' => \Str::slug($input['name']) . '.localhost',
+        ]);
+
         return User::create([
+            'tenant_id' => $tenant->id,
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
