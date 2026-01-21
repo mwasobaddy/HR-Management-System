@@ -6,6 +6,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\DatabaseConfig;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
@@ -97,14 +98,20 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     }
 
     /**
-     * Get database name for this tenant.
+     * Get database configuration for this tenant.
      */
-    public function database(): string
+    public function database(): DatabaseConfig
     {
+        $config = new DatabaseConfig($this);
+
+        // For shared database, use the central database connection
         if ($this->database_type === 'shared') {
-            return config('database.connections.' . config('tenancy.database.central_connection') . '.database');
+            $config->name = config('database.connections.' . config('tenancy.database.central_connection') . '.database');
+        } else {
+            // For dedicated database, generate a unique database name
+            $config->name = $this->database_name ?? config('tenancy.database.prefix') . $this->id . config('tenancy.database.suffix');
         }
 
-        return $this->database_name ?? config('tenancy.database.prefix') . $this->id . config('tenancy.database.suffix');
+        return $config;
     }
 }
