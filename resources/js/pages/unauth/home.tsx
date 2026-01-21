@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+
 import { Button } from '@/components/ui/button';
 
 interface SubscriptionPlan {
@@ -50,7 +51,7 @@ export default function Home({ plans }: HomeProps) {
                                 <Link href="/login">
                                     <Button variant="ghost">Log in</Button>
                                 </Link>
-                                <Link href="/billing">
+                                <Link href="/pricing">
                                     <Button>Get Started</Button>
                                 </Link>
                             </div>
@@ -71,7 +72,7 @@ export default function Home({ plans }: HomeProps) {
                                 everything you need in one powerful platform.
                             </p>
                             <div className="mt-10 flex items-center justify-center gap-4">
-                                <Link href="/billing">
+                                <Link href="/pricing">
                                     <Button size="lg" className="text-lg">
                                         Start Free Trial
                                     </Button>
@@ -211,7 +212,7 @@ export default function Home({ plans }: HomeProps) {
                                             </li>
                                         ))}
                                     </ul>
-                                    <Link href="/billing" className="mt-8 block">
+                                    <Link href="/pricing" className="mt-8 block">
                                         <Button
                                             className="w-full"
                                             variant={plan.slug === 'pro' ? 'default' : 'outline'}
@@ -235,7 +236,7 @@ export default function Home({ plans }: HomeProps) {
                             Join thousands of companies using Obseque HRMS
                         </p>
                         <div className="mt-10 flex items-center justify-center gap-4">
-                            <Link href="/billing">
+                            <Link href="/pricing">
                                 <Button size="lg" variant="secondary" className="text-lg">
                                     Start Free Trial
                                 </Button>
