@@ -187,7 +187,7 @@ return [
      * All migrations run in central database with tenant_id scoping.
      */
     'migration_parameters' => [
-        '--force' => true,
+        '--force' => true, // This needs to be true to run migrations in production
         '--path' => [database_path('migrations')],
         '--realpath' => true,
     ],
