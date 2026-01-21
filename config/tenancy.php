@@ -183,10 +183,12 @@ return [
 
     /**
      * Parameters used by the tenants:migrate command.
+     * Note: Not used in single-database tenancy mode.
+     * All migrations run in central database with tenant_id scoping.
      */
     'migration_parameters' => [
-        '--force' => true, // This needs to be true to run migrations in production.
-        '--path' => [database_path('migrations/tenant')],
+        '--force' => true,
+        '--path' => [database_path('migrations')],
         '--realpath' => true,
     ],
 
