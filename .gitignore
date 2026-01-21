@@ -26,3 +26,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+
+# Custom additions
+HRMS_Planning.md
