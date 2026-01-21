@@ -1,6 +1,7 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
 import { FormEventHandler, useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 
 export default function Support() {
     const [submitted, setSubmitted] = useState(false);
@@ -22,7 +23,7 @@ export default function Support() {
     const faqs = [
         {
             question: 'How do I get started?',
-            answer: 'Simply visit our billing page, choose a plan that fits your needs, and follow the setup wizard after registration.',
+            answer: 'Simply visit our pricing page, choose a plan that fits your needs, and follow the setup wizard after registration.',
         },
         {
             question: 'What payment methods do you accept?',
@@ -30,7 +31,7 @@ export default function Support() {
         },
         {
             question: 'Can I change plans later?',
-            answer: 'Yes! You can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.',
+            answer: 'Yes! You can upgrade or downgrade your plan at any time. Changes will be reflected in your next pricing cycle.',
         },
         {
             question: 'Is my data secure?',
@@ -62,7 +63,7 @@ export default function Support() {
                                 <Link href="/">
                                     <Button variant="ghost">Back to Home</Button>
                                 </Link>
-                                <Link href="/billing">
+                                <Link href="/pricing">
                                     <Button>Get Started</Button>
                                 </Link>
                             </div>
