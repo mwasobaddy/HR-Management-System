@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\PublicController;
+use App\Http\Controllers\Unauth\PublicController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
 // Public pages
 Route::get('/', [PublicController::class, 'home'])->name('home');
-Route::get('/billing', [PublicController::class, 'billing'])->name('billing');
+Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
 Route::get('/demo', [PublicController::class, 'demo'])->name('demo');
 Route::get('/support', [PublicController::class, 'support'])->name('support');
 
