@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
 import { useState } from 'react';
+
+import { Button } from '@/components/ui/button';
 
 interface DemoAccount {
     email: string;
@@ -45,7 +46,7 @@ export default function Demo({ demoAccounts }: DemoProps) {
                                 <Link href="/">
                                     <Button variant="ghost">Back to Home</Button>
                                 </Link>
-                                <Link href="/billing">
+                                <Link href="/pricing">
                                     <Button>Get Started</Button>
                                 </Link>
                             </div>
@@ -178,7 +179,7 @@ export default function Demo({ demoAccounts }: DemoProps) {
                         <p className="text-slate-600 dark:text-slate-400">
                             Ready to get started with your own account?
                         </p>
-                        <Link href="/billing" className="mt-4 inline-block">
+                        <Link href="/pricing" className="mt-4 inline-block">
                             <Button size="lg">Choose Your Plan</Button>
                         </Link>
                     </div>
