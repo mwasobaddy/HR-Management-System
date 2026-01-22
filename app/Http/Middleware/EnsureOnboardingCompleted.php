@@ -31,7 +31,7 @@ class EnsureOnboardingCompleted
         }
 
         // If tenant exists and onboarding not completed, redirect to onboarding
-        if ($tenant && !$tenant->onboarding_completed && !$request->routeIs('onboarding')) {
+        if ($tenant && !$tenant->onboarding_completed && !$request->routeIs('onboarding*')) {
             return redirect()->route('onboarding');
         }
 
