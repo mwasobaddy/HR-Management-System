@@ -13,6 +13,7 @@ class CompanyProfile extends Model
         'tenant_id',
         'company_name',
         'address',
+        'address_line_2',
         'city',
         'state',
         'country',
@@ -28,14 +29,24 @@ class CompanyProfile extends Model
         'fiscal_year_start',
         'timezone',
         'currency',
-        'work_start_time',
-        'work_end_time',
-        'work_days',
+        'working_hours',
         'holidays',
+        'ai_provider',
+        'ai_model',
+        'ai_api_key',
+        'google_calendar_api_key',
+        'google_meet_api_key',
+        'smtp_host',
+        'smtp_port',
+        'smtp_username',
+        'smtp_password',
+        'smtp_encryption',
+        'smtp_from_address',
+        'smtp_from_name',
     ];
 
     protected $casts = [
-        'work_days' => 'array',
+        'working_hours' => 'array',
         'holidays' => 'array',
     ];
 

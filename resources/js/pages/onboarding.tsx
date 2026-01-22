@@ -40,7 +40,7 @@ export default function Onboarding() {
                             
                             <div className="space-y-3">
                                 <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                                    <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
                                         1
                                     </div>
                                     <div>
@@ -52,7 +52,7 @@ export default function Onboarding() {
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                                    <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
                                         2
                                     </div>
                                     <div>
@@ -64,7 +64,7 @@ export default function Onboarding() {
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                                    <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
                                         3
                                     </div>
                                     <div>
@@ -76,7 +76,7 @@ export default function Onboarding() {
                                 </div>
 
                                 <div className="flex items-start gap-3">
-                                    <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                                    <div className="shrink-0 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
                                         4
                                     </div>
                                     <div>

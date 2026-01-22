@@ -21,6 +21,14 @@ return new class extends Migration
             $table->dropUnique(['email']);
             $table->unique(['tenant_id', 'email']);
 
+            // Add name components
+            $table->string('first_name')->nullable()->after('tenant_id');
+            $table->string('last_name')->nullable()->after('first_name');
+            
+            // Add work email and language
+            $table->string('work_email')->nullable()->after('email');
+            $table->string('language')->default('en')->after('work_email');
+
             // Add HRMS-specific fields
             $table->string('role')->default('employee')->after('password'); // admin, hr_manager, manager, employee
             $table->string('employee_id')->nullable()->after('role');

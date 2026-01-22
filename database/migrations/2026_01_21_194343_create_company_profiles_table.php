@@ -19,6 +19,7 @@ return new class extends Migration
             
             $table->string('company_name');
             $table->text('address')->nullable();
+            $table->string('address_line_2')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('country')->nullable();
@@ -34,10 +35,24 @@ return new class extends Migration
             $table->string('fiscal_year_start')->default('01-01'); // MM-DD
             $table->string('timezone')->default('UTC');
             $table->string('currency')->default('USD');
-            $table->time('work_start_time')->default('09:00:00');
-            $table->time('work_end_time')->default('17:00:00');
-            $table->json('work_days')->nullable(); // ['monday', 'tuesday', ...]
+            $table->json('working_hours')->nullable(); // {monday: {enabled: true, start: '09:00', end: '17:00'}, ...}
             $table->json('holidays')->nullable(); // Array of holiday dates
+            
+            // API Configurations
+            $table->string('ai_provider')->nullable(); // openai, anthropic, google
+            $table->string('ai_model')->nullable();
+            $table->string('ai_api_key')->nullable();
+            $table->string('google_calendar_api_key')->nullable();
+            $table->string('google_meet_api_key')->nullable();
+            
+            // SMTP Configuration
+            $table->string('smtp_host')->nullable();
+            $table->integer('smtp_port')->nullable();
+            $table->string('smtp_username')->nullable();
+            $table->string('smtp_password')->nullable();
+            $table->string('smtp_encryption')->nullable();
+            $table->string('smtp_from_address')->nullable();
+            $table->string('smtp_from_name')->nullable();
             $table->timestamps();
 
             // One company profile per tenant

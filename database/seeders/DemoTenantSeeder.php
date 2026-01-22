@@ -72,9 +72,15 @@ class DemoTenantSeeder extends Seeder
             'company_size' => 50,
             'timezone' => 'America/Los_Angeles',
             'currency' => 'USD',
-            'work_start_time' => '09:00:00',
-            'work_end_time' => '17:00:00',
-            'work_days' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+            'working_hours' => [
+                'monday' => ['enabled' => true, 'start' => '09:00', 'end' => '17:00'],
+                'tuesday' => ['enabled' => true, 'start' => '09:00', 'end' => '17:00'],
+                'wednesday' => ['enabled' => true, 'start' => '09:00', 'end' => '17:00'],
+                'thursday' => ['enabled' => true, 'start' => '09:00', 'end' => '17:00'],
+                'friday' => ['enabled' => true, 'start' => '09:00', 'end' => '17:00'],
+                'saturday' => ['enabled' => false, 'start' => null, 'end' => null],
+                'sunday' => ['enabled' => false, 'start' => null, 'end' => null],
+            ],
         ]);
 
         // Create departments
