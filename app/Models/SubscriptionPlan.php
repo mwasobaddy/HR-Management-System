@@ -95,5 +95,62 @@ class SubscriptionPlan extends Model
     {
         return $this->max_job_posts === -1;
     }
+
+    /**
+     * Get yearly price savings compared to monthly.
+     */
+    public function getYearlySavings(): float
+    {
+        if ($this->price_monthly == 0) {
+            return 0;
+        }
+
+        $monthlyTotal = $this->price_monthly * 12;
+        return $monthlyTotal - $this->price_yearly;
+    }
+
+    /**
+     * Get yearly savings as a percentage.
+     */
+    public function getYearlySavingsPercentage(): float
+    {
+        if ($this->price_monthly == 0) {
+            return 0;
+        }
+
+        $monthlyTotal = $this->price_monthly * 12;
+        if ($monthlyTotal == 0) {
+            return 0;
+        }
+
+        return (($monthlyTotal - $this->price_yearly) / $monthlyTotal) * 100;
+    }
+
+    /**
+     * Scope query to only active plans.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Check if plan includes a specific feature.
+     */
+    public function hasFeature(string $feature): bool
+    {
+        // Check boolean feature flags
+        $featureColumn = 'has_' . $feature;
+        if (isset($this->attributes[$featureColumn])) {
+            return (bool) $this->$featureColumn;
+        }
+
+        // Check in features array
+        if (is_array($this->features)) {
+            return in_array($feature, $this->features);
+        }
+
+        return false;
+    }
 }
 

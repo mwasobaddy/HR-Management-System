@@ -22,7 +22,11 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'tenant_id',
         'name',
+        'first_name',
+        'last_name',
         'email',
+        'work_email',
+        'language',
         'password',
         'role',
         'employee_id',
