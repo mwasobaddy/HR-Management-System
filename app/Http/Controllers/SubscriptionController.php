@@ -6,6 +6,7 @@ use App\Models\CompanyProfile;
 use App\Models\SubscriptionPlan;
 use App\Models\Tenant;
 use App\Models\User;
+use Stancl\Tenancy\Database\Models\Domain;
 use App\Notifications\WelcomeCredentials;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +34,14 @@ class SubscriptionController extends Controller
         }
 
         return Inertia::render('subscribe', [
-            'plan' => $plan
+            'plan' => [
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'price' => $plan->price_monthly,
+                'billing_cycle' => 'month',
+                'max_users' => $plan->max_users,
+                'features' => $plan->features ?? [],
+            ]
         ]);
     }
 
@@ -45,6 +53,18 @@ class SubscriptionController extends Controller
         $validated = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
             'company_name' => 'required|string|max:255',
+            'domain' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z0-9\-]+$/',
+                function ($attribute, $value, $fail) {
+                    $fullDomain = $value . '.hrms.test';
+                    if (Domain::where('domain', $fullDomain)->exists()) {
+                        $fail('This domain is already taken.');
+                    }
+                },
+            ],
             'email' => 'required|string|email|max:255|unique:users',
             'admin_name' => 'required|string|max:255',
             'payment_type' => 'nullable|in:recurring,one-time',
@@ -73,17 +93,21 @@ class SubscriptionController extends Controller
             // Create tenant
             $tenant = Tenant::create([
                 'id' => Str::uuid(),
-                'name' => Str::slug($validated['company_name']),
-                'subscription_plan_id' => $plan->id,
+                'company_name' => $validated['company_name'],
+                'slug' => $validated['domain'],
+                'plan_id' => $plan->id,
+                'subscription_status' => $plan->price == 0 ? 'trial' : 'active',
                 'trial_ends_at' => $plan->price == 0 ? now()->addDays(14) : null,
+                'subscription_ends_at' => $plan->price > 0 ? now()->addMonth() : null,
                 'subscription_type' => $validated['payment_type'] ?? null,
-                'is_demo' => false,
+                'database_type' => $plan->database_type,
                 'onboarding_completed' => false,
+                'is_demo' => false,
             ]);
 
             // Create domain
             $tenant->domains()->create([
-                'domain' => Str::slug($validated['company_name']) . '.hrms.test',
+                'domain' => $validated['domain'] . '.hrms.test',
             ]);
 
             // Initialize tenant context
