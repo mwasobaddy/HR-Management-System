@@ -27,7 +27,16 @@ Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
 // Onboarding route (only for authenticated users, skip onboarding check)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('onboarding', function () {
-        return Inertia::render('onboarding');
+        $user = auth()->user();
+        $tenant = tenant();
+        // For now, assume a default plan or get from tenant
+        $plan = \App\Models\SubscriptionPlan::where('slug', 'free')->first() ?? \App\Models\SubscriptionPlan::first();
+
+        return Inertia::render('onboarding', [
+            'user' => $user,
+            'tenant' => $tenant,
+            'plan' => $plan,
+        ]);
     })->name('onboarding');
     
     Route::post('onboarding/complete', [OnboardingController::class, 'complete'])
