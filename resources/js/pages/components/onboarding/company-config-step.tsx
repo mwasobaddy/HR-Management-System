@@ -29,8 +29,8 @@ export default function CompanyConfigStep({ formData, errors, onChange }: Compan
             />
 
             <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                    <Label htmlFor="branch_name">Initial Branch Name *</Label>
+                <div className='grid gap-2'>
+                    <Label htmlFor="branch_name">Initial Branch Name <span className="text-red-600">*</span></Label>
                     <Input
                         id="branch_name"
                         value={formData.branch_name}
@@ -38,12 +38,12 @@ export default function CompanyConfigStep({ formData, errors, onChange }: Compan
                         required
                         placeholder="Main Branch"
                     />
-                    <p className="text-xs text-gray-500 mt-1">You can add more branches later</p>
+                    <p className="text-sm text-blue-600">You can add more branches later</p>
                     <InputError message={errors.branch_name} />
                 </div>
 
-                <div>
-                    <Label htmlFor="department_name">Initial Department Name *</Label>
+                <div className='grid gap-2'>
+                    <Label htmlFor="department_name">Initial Department Name <span className="text-red-600">*</span></Label>
                     <Input
                         id="department_name"
                         value={formData.department_name}
@@ -51,7 +51,7 @@ export default function CompanyConfigStep({ formData, errors, onChange }: Compan
                         required
                         placeholder="General"
                     />
-                    <p className="text-xs text-gray-500 mt-1">You can add more departments later</p>
+                    <p className="text-sm text-blue-600">You can add more departments later</p>
                     <InputError message={errors.department_name} />
                 </div>
             </div>

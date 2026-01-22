@@ -37,7 +37,7 @@ export default function AdminDetailsStep({
         <div className="space-y-4">
             <div className="grid md:grid-cols-2 gap-6">
                 <div className='grid gap-2'>
-                    <Label htmlFor="first_name">First Name *</Label>
+                    <Label htmlFor="first_name">First Name <span className="text-red-600">*</span></Label>
                     <Input
                         id="first_name"
                         value={formData.first_name}
@@ -49,7 +49,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className='grid gap-2'>
-                    <Label htmlFor="last_name">Last Name *</Label>
+                    <Label htmlFor="last_name">Last Name <span className="text-red-600">*</span></Label>
                     <Input
                         id="last_name"
                         value={formData.last_name}
@@ -61,7 +61,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className="grid gap-2 md:col-span-2">
-                    <Label htmlFor="personal_email">Personal Email (Login Email) *</Label>
+                    <Label htmlFor="personal_email">Personal Email (Login Email) <span className="text-red-600">*</span></Label>
                     <Input
                         id="personal_email"
                         type="email"
@@ -82,7 +82,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className="grid gap-2 md:col-span-2">
-                    <Label htmlFor="work_email">Work Email</Label>
+                    <Label htmlFor="work_email">Work Email <span className="text-red-600">*</span></Label>
                     <Input
                         id="work_email"
                         type="email"
@@ -94,7 +94,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className="grid gap-2 md:col-span-2">
-                    <Label htmlFor="language">Preferred Language *</Label>
+                    <Label htmlFor="language">Preferred Language <span className="text-red-600">*</span></Label>
                     <Select value={formData.language} onValueChange={(value) => onChange('language', value)}>
                         <SelectTrigger>
                             <SelectValue />
@@ -111,7 +111,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className='grid gap-2'>
-                    <Label htmlFor="password">New Password *</Label>
+                    <Label htmlFor="password">New Password <span className="text-red-600">*</span></Label>
                     <div className="relative">
                         <Input
                             id="password"
@@ -135,7 +135,7 @@ export default function AdminDetailsStep({
                 </div>
 
                 <div className='grid gap-2'>
-                    <Label htmlFor="password_confirmation">Confirm Password *</Label>
+                    <Label htmlFor="password_confirmation">Confirm Password <span className="text-red-600">*</span></Label>
                     <div className="relative">
                         <Input
                             id="password_confirmation"

@@ -33,12 +33,12 @@ export default function WorkingHoursGrid({ workingHours, onChange }: WorkingHour
 
     return (
         <div>
-            <Label className="text-base font-semibold mb-4 block">Working Hours *</Label>
+            <Label className="text-base font-semibold mb-4 block">Working Hours <span className="text-red-600">*</span></Label>
             <div className="space-y-3">
                 {days.map((day) => {
                     const dayData = workingHours[day];
                     return (
-                        <div key={day} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                        <div key={day} className="flex items-center gap-4 p-3 rounded-lg">
                             <div className="flex items-center gap-2 w-32">
                                 <input
                                     type="checkbox"
@@ -60,7 +60,7 @@ export default function WorkingHoursGrid({ workingHours, onChange }: WorkingHour
                                         required
                                         className="w-32"
                                     />
-                                    <span className="text-gray-500">to</span>
+                                    <span>to</span>
                                     <Input
                                         type="time"
                                         value={dayData.end}
