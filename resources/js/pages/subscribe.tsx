@@ -96,7 +96,7 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                         <input type="hidden" name="plan_id" value={plan.id} />
 
                                         {/* Company Information */}
-                                        <div className="space-y-4">
+                                        <div className="grid gap-6">
                                             <h3 className="text-lg font-semibold">Company Information</h3>
                                             <div className="grid gap-2">
                                                 <Label htmlFor="company_name">Company Name *</Label>
@@ -109,6 +109,20 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                                     placeholder="Acme Corporation"
                                                 />
                                                 <InputError message={errors.company_name} />
+                                            </div>
+                                            <div className="grid gap-2">
+                                                <Label htmlFor="domain">Domain Name *</Label>
+                                                <Input
+                                                    id="domain"
+                                                    name="domain"
+                                                    type="text"
+                                                    required
+                                                    placeholder="yourcompany"
+                                                />
+                                                <p className="text-sm text-blue-600">
+                                                    This will be your login URL: yourcompany.hrms.test
+                                                </p>
+                                                <InputError message={errors.domain} />
                                             </div>
                                             <div className="grid gap-2">
                                                 <Label htmlFor="email">Business Email *</Label>
@@ -135,7 +149,7 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                         </div>
 
                                         {/* Payment Information */}
-                                        {plan.price !== '0' && (
+                                        {(plan.name !== 'Free' && plan.name !== 'Plus') && (
                                             <div className="space-y-4">
                                                 <h3 className="text-lg font-semibold">Payment Information</h3>
                                                 <div className="grid gap-2">
@@ -222,6 +236,9 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                                 <ArrowLeft className="h-4 w-4" />
                                                 Back
                                             </Button>
+
+
+                                            
                                             <Button
                                                 key="submit"
                                                 type="submit"
@@ -231,7 +248,8 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                             >
                                                 {processing && <Spinner />}
                                                 <CircleCheckBig className="h-4 w-4" />
-                                                {plan.price === '0' ? 'Start Free Trial' : `Pay $${plan.price} & Subscribe`}
+                                                {/* {plan.price === 0 ? 'Start Free Trial' : `Pay $${plan.price} & Subscribe`} */}
+                                                {(plan.name === 'Free' || plan.name === 'Plus') && ' Start Free Trial'}
                                             </Button>
                                         </div>
                                     </>
