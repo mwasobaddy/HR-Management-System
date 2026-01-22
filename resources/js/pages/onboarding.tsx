@@ -1,15 +1,27 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Building2, User, Settings, Zap, BadgeCheck, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { Building2, User, Settings, Zap, BadgeCheck, ArrowLeft, CircleCheckBig } from 'lucide-react';
+import { useState, type FormEvent, type MouseEvent, useEffect, useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFormPersistence } from '@/hooks/use-form-persistence';
 
 import AdminDetailsStep from './components/onboarding/admin-details-step';
 import APISettingsStep from './components/onboarding/api-settings-step';
 import CompanyConfigStep from './components/onboarding/company-config-step';
 import CompanyDetailsStep from './components/onboarding/company-details-step';
 import OnboardingStepIndicator from './components/onboarding/onboarding-step-indicator';
+
+import {
+    AlertDialog,
+    // AlertDialogAction,
+    // AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type WorkingDaySchedule = {
     enabled: boolean;
@@ -83,8 +95,12 @@ interface OnboardingProps {
 
 export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
     const [currentStep, setCurrentStep] = useState(1);
+    const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+    const [hasAcknowledgedRestore, setHasAcknowledgedRestore] = useState(false);
+    const savedStepRef = useRef<number | null>(null);
 
     const isProOrEnterprise = ['pro', 'enterprise'].includes(plan.slug);
+    const stepStorageKey = `onboarding-step-${user.id}`;
 
     const form = useForm<OnboardingFormData>({
         company_name: '',
@@ -112,7 +128,7 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
             wednesday: { enabled: true, start: '09:00', end: '17:00' },
             thursday: { enabled: true, start: '09:00', end: '17:00' },
             friday: { enabled: true, start: '09:00', end: '17:00' },
-            saturday: { enabled: false, start: '', end: '' },
+            saturday: { enabled: false, start: '09:00', end: '13:00' },
             sunday: { enabled: false, start: '', end: '' },
         },
         branch_name: 'Main Branch',
@@ -131,6 +147,60 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
         smtp_from_name: '',
     });
 
+    // Form persistence with session storage
+    const { savedData, hasSavedData, clearSavedData } = useFormPersistence({
+        storageKey: `onboarding-draft-${user.id}`,
+        formData: form.data,
+        enabled: true,
+    });
+
+    // Cache saved step on mount
+    useEffect(() => {
+        const storedStep = Number(sessionStorage.getItem(stepStorageKey));
+        if (!Number.isNaN(storedStep) && storedStep >= 1) {
+            savedStepRef.current = storedStep;
+        }
+    }, [stepStorageKey]);
+
+    // Check for saved data on mount and show restore dialog when needed
+    useEffect(() => {
+        if (hasSavedData && savedData) {
+            // Use a microtask to avoid cascading renders
+            queueMicrotask(() => {
+                setShowRestoreDialog(true);
+            });
+        } else {
+            queueMicrotask(() => {
+                setHasAcknowledgedRestore(true);
+            });
+        }
+    }, [hasSavedData, savedData]);
+
+    // Handle restore dialog confirmation
+    const handleRestoreData = () => {
+        if (savedData) {
+            // Restore all form data
+            Object.entries(savedData).forEach(([key, value]) => {
+                applyFormChange(key as keyof OnboardingFormData, value as OnboardingFormData[keyof OnboardingFormData]);
+            });
+            const storedStep = savedStepRef.current ?? Number(sessionStorage.getItem(stepStorageKey));
+            if (!Number.isNaN(storedStep) && storedStep >= 1) {
+                setCurrentStep(Math.min(storedStep, steps.length));
+            }
+            setHasAcknowledgedRestore(true);
+            setShowRestoreDialog(false);
+        }
+    };
+
+    const handleDiscardData = () => {
+        clearSavedData();
+        sessionStorage.removeItem(stepStorageKey);
+        savedStepRef.current = null;
+        setCurrentStep(1);
+        setHasAcknowledgedRestore(true);
+        setShowRestoreDialog(false);
+    };
+
     const applyFormChange = <K extends keyof OnboardingFormData>(
         field: K,
         value: OnboardingFormData[K],
@@ -140,6 +210,15 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
             [field]: value,
         }));
     };
+
+    // Persist current step so we can restore where user left off
+    useEffect(() => {
+        if (!hasAcknowledgedRestore) {
+            return;
+        }
+        sessionStorage.setItem(stepStorageKey, currentStep.toString());
+        return () => {};
+    }, [currentStep, hasAcknowledgedRestore, stepStorageKey]);
 
     const handleFormChange: (field: string, value: unknown) => void = (field, value) => {
         applyFormChange(
@@ -175,20 +254,22 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
         }] : []),
     ];
 
-    const handleNext = () => {
+    const handleNext = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         if (currentStep < steps.length) {
-            setCurrentStep(currentStep + 1);
+            setCurrentStep((previous) => Math.min(previous + 1, steps.length));
         }
     };
 
-    const handleBack = () => {
+    const handleBack = (event: MouseEvent<HTMLButtonElement>) => {
+        event.preventDefault();
         if (currentStep > 1) {
-            setCurrentStep(currentStep - 1);
+            setCurrentStep((previous) => Math.max(previous - 1, 1));
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         
         // Only submit if on the last step
         if (currentStep !== steps.length) {
@@ -198,6 +279,8 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
         form.post('/onboarding/complete', {
             preserveScroll: true,
             onSuccess: () => {
+                clearSavedData();
+                sessionStorage.removeItem(stepStorageKey);
                 router.visit('/dashboard');
             },
         });
@@ -215,6 +298,35 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
     return (
         <>
             <Head title="Complete Your Setup" />
+
+            {/* Restore Progress Dialog */}
+            <AlertDialog open={showRestoreDialog} onOpenChange={setShowRestoreDialog}>
+                <AlertDialogContent className="bg-linear-to-t dark:from-neutral-900 dark:to-neutral-800 from-red-50 to-purple-50 dark:border-neutral-700 border">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="flex items-center gap-2">
+                            <CircleCheckBig className="h-5 w-5 text-blue-600" />
+                            Continue Where You Left Off?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            We found your saved progress from a previous session. Would you like to continue from where you left off, or start fresh?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <Button
+                            onClick={handleDiscardData}
+                            className='bg-primary dark:bg-red-500 dark:text-primary dark:hover:bg-red-600 transition-colors duration-200'
+                        >
+                            Start Fresh
+                        </Button>
+                        <Button
+                            onClick={handleRestoreData}
+                            className='bg-blue-700 hover:bg-blue-600 dark:bg-primary dark:hover:bg-zinc-200 transition-colors duration-200'
+                        >
+                            Continue Progress
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             
             <div className="min-h-screen bg-zinc-50 dark:bg-neutral-900 py-8 px-4">
                 <div className="max-w-7xl mx-auto grid grid-cols-7 gap-8">
@@ -340,6 +452,7 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
                                 {/* Navigation Buttons */}
                                 <div className="flex justify-between pt-6">
                                     <Button
+                                        key="back"
                                         type="button"
                                         className='bg-primary dark:bg-red-500 dark:text-primary dark:hover:bg-red-600 transition-colors duration-200'
                                         onClick={handleBack}
@@ -351,6 +464,7 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
 
                                     {currentStep < steps.length ? (
                                         <Button 
+                                            key="next"
                                             type="button" 
                                             onClick={handleNext} 
                                             className='bg-blue-700 hover:bg-blue-600 dark:bg-primary dark:hover:bg-zinc-200 transition-colors duration-200'
@@ -359,10 +473,12 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
                                         </Button>
                                     ) : (
                                         <Button 
+                                            key="submit"
                                             type="submit" 
                                             disabled={form.processing}
-                                            className='bg-green-700 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 transition-colors duration-200'
+                                            className='bg-blue-700 hover:bg-blue-600 dark:bg-primary dark:hover:bg-zinc-200 transition-colors duration-200'
                                         >
+                                            <CircleCheckBig className="h-4 w-4" />
                                             {form.processing ? 'Completing...' : 'Complete Setup'}
                                         </Button>
                                     )}
