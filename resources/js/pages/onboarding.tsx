@@ -2,6 +2,16 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { Building2, User, Settings, Zap, BadgeCheck, ArrowLeft, CircleCheckBig } from 'lucide-react';
 import { useState, type FormEvent, type MouseEvent, useEffect, useRef } from 'react';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useFormPersistence } from '@/hooks/use-form-persistence';
+
+import AdminDetailsStep from './components/onboarding/admin-details-step';
+import APISettingsStep from './components/onboarding/api-settings-step';
+import CompanyConfigStep from './components/onboarding/company-config-step';
+import CompanyDetailsStep from './components/onboarding/company-details-step';
+import OnboardingStepIndicator from './components/onboarding/onboarding-step-indicator';
+
 import {
     AlertDialog,
     // AlertDialogAction,
@@ -12,15 +22,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useFormPersistence } from '@/hooks/use-form-persistence';
-
-import AdminDetailsStep from './components/onboarding/admin-details-step';
-import APISettingsStep from './components/onboarding/api-settings-step';
-import CompanyConfigStep from './components/onboarding/company-config-step';
-import CompanyDetailsStep from './components/onboarding/company-details-step';
-import OnboardingStepIndicator from './components/onboarding/onboarding-step-indicator';
 
 
 type WorkingDaySchedule = {
