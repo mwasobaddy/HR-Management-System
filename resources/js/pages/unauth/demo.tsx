@@ -34,20 +34,20 @@ export default function Demo({ demoAccounts }: DemoProps) {
         <>
             <Head title="Try Demo - Obseque HRMS" />
 
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+            <div className="min-h-screen bg-linear-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
                 {/* Navigation */}
-                <nav className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+                <nav className="border-b border-[#8E2DE2] dark:border-[#7209B7]/30 bg-white dark:bg-slate-950">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
-                            <Link href="/" className="text-2xl font-bold text-slate-900 dark:text-white">
-                                Obseque <span className="text-blue-600">HRMS</span>
+                            <Link href="/" className="text-2xl font-bold text-[#F00000]">
+                                Obseque <span className="text-[#F00000]">HRMS</span>
                             </Link>
                             <div className="flex items-center space-x-4">
                                 <Link href="/">
-                                    <Button variant="ghost">Back to Home</Button>
+                                    <Button variant="ghost" className="text-[#F00000]">Back to Home</Button>
                                 </Link>
                                 <Link href="/pricing">
-                                    <Button>Get Started</Button>
+                                    <Button className="text-[#F00000]">Get Started</Button>
                                 </Link>
                             </div>
                         </div>
@@ -57,10 +57,10 @@ export default function Demo({ demoAccounts }: DemoProps) {
                 {/* Main Content */}
                 <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-4xl font-bold tracking-tight text-[#F00000]">
                             Try the Demo
                         </h1>
-                        <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+                        <p className="mt-4 text-lg text-[#F00000]">
                             Experience Obseque HRMS with full Pro-level features. Choose any account below to log in.
                         </p>
                     </div>
@@ -70,7 +70,7 @@ export default function Demo({ demoAccounts }: DemoProps) {
                         {demoAccounts.map((account, index) => (
                             <div
                                 key={index}
-                                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
+                                className="rounded-lg border border-[#8E2DE2] bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-[#7209B7]/30 dark:bg-slate-900"
                             >
                                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                                     <div className="flex-1">
@@ -82,10 +82,10 @@ export default function Demo({ demoAccounts }: DemoProps) {
                                                 {account.role === 'Employee' && '👤'}
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold text-slate-900 dark:text-white">
+                                                <h3 className="font-semibold text-[#F00000]">
                                                     {account.role}
                                                 </h3>
-                                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                                <p className="text-sm text-[#F00000]">
                                                     {account.description}
                                                 </p>
                                             </div>
@@ -93,10 +93,10 @@ export default function Demo({ demoAccounts }: DemoProps) {
                                         
                                         <div className="mt-4 space-y-2">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                                <span className="text-sm font-medium text-[#F00000]">
                                                     Email:
                                                 </span>
-                                                <code className="rounded bg-slate-100 px-2 py-1 text-sm text-slate-900 dark:bg-slate-800 dark:text-slate-100">
+                                                <code className="rounded bg-slate-100 px-2 py-1 text-sm text-[#F00000] dark:bg-slate-800 dark:text-[#F00000]">
                                                     {account.email}
                                                 </code>
                                                 <button
@@ -116,7 +116,7 @@ export default function Demo({ demoAccounts }: DemoProps) {
                                                 </button>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                                                <span className="text-sm font-medium text-[#F00000]">
                                                     Password:
                                                 </span>
                                                 <code className="rounded bg-slate-100 px-2 py-1 text-sm text-slate-900 dark:bg-slate-800 dark:text-slate-100">
@@ -157,7 +157,7 @@ export default function Demo({ demoAccounts }: DemoProps) {
                     {/* Info Section */}
                     <div className="mt-12 rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/20">
                         <div className="flex items-start gap-3">
-                            <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                                 <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div>

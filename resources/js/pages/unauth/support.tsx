@@ -51,20 +51,20 @@ export default function Support() {
         <>
             <Head title="Support - Obseque HRMS" />
 
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+            <div className="min-h-screen bg-linear-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
                 {/* Navigation */}
-                <nav className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+                <nav className="border-b border-[#8E2DE2] dark:border-[#7209B7]/30 bg-white dark:bg-slate-950">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
-                            <Link href="/" className="text-2xl font-bold text-slate-900 dark:text-white">
-                                Obseque <span className="text-blue-600">HRMS</span>
+                            <Link href="/" className="text-2xl font-bold text-[#F00000]">
+                                Obseque <span className="text-[#F00000]">HRMS</span>
                             </Link>
                             <div className="flex items-center space-x-4">
                                 <Link href="/">
-                                    <Button variant="ghost">Back to Home</Button>
+                                    <Button variant="ghost" className="text-[#F00000]">Back to Home</Button>
                                 </Link>
                                 <Link href="/pricing">
-                                    <Button>Get Started</Button>
+                                    <Button className="text-[#F00000]">Get Started</Button>
                                 </Link>
                             </div>
                         </div>
@@ -74,10 +74,10 @@ export default function Support() {
                 {/* Main Content */}
                 <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h1 className="text-4xl font-bold tracking-tight text-[#F00000]">
                             How can we help?
                         </h1>
-                        <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+                        <p className="mt-4 text-lg text-[#F00000]">
                             Get answers to your questions or reach out to our support team
                         </p>
                     </div>
@@ -85,16 +85,16 @@ export default function Support() {
                     <div className="mt-16 grid gap-12 lg:grid-cols-2">
                         {/* FAQ Section */}
                         <div>
-                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                            <h2 className="text-2xl font-bold text-[#F00000]">
                                 Frequently Asked Questions
                             </h2>
                             <div className="mt-6 space-y-4">
                                 {faqs.map((faq, index) => (
                                     <details
                                         key={index}
-                                        className="group rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+                                        className="group rounded-lg border border-[#8E2DE2] bg-white dark:border-[#7209B7]/30 dark:bg-slate-900"
                                     >
-                                        <summary className="flex cursor-pointer items-center justify-between p-4 font-medium text-slate-900 dark:text-white">
+                                        <summary className="flex cursor-pointer items-center justify-between p-4 font-medium text-[#F00000]">
                                             {faq.question}
                                             <svg
                                                 className="h-5 w-5 transition-transform group-open:rotate-180"
@@ -108,7 +108,7 @@ export default function Support() {
                                                 <path d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </summary>
-                                        <div className="border-t border-slate-200 p-4 text-slate-600 dark:border-slate-800 dark:text-slate-400">
+                                        <div className="border-t border-[#8E2DE2] p-4 text-[#F00000] dark:border-[#7209B7]/30 dark:text-[#F00000]">
                                             {faq.answer}
                                         </div>
                                     </details>

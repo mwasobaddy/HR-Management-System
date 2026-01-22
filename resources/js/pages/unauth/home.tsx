@@ -23,36 +23,36 @@ export default function Home({ plans }: HomeProps) {
         <>
             <Head title="Obseque HRMS - Modern HR Management System" />
 
-            <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+            <div className="min-h-screen bg-linear-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
                 {/* Navigation */}
-                <nav className="fixed top-0 left-0 right-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-950/80">
+                <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#8E2DE2] dark:border-[#7209B7]/30 bg-white/80 backdrop-blur-sm dark:bg-slate-950/80">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="flex h-16 items-center justify-between">
                             <div className="flex items-center">
-                                <Link href="/" className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    Obseque <span className="text-blue-600">HRMS</span>
+                                <Link href="/" className="text-2xl font-bold text-[#F00000]">
+                                    Obseque <span className="text-[#F00000]">HRMS</span>
                                 </Link>
                             </div>
                             <div className="hidden md:flex md:items-center md:space-x-8">
-                                <a href="#features" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                                <a href="#features" className="text-[#F00000] font-semibold">
                                     Features
                                 </a>
-                                <a href="#pricing" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                                <a href="#pricing" className="text-[#F00000] font-semibold">
                                     Pricing
                                 </a>
-                                <Link href="/support" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                                <Link href="/support" className="text-[#F00000] font-semibold">
                                     Support
                                 </Link>
-                                <Link href="/demo" className="text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                                <Link href="/demo" className="text-[#F00000] font-semibold">
                                     Try Demo
                                 </Link>
                             </div>
                             <div className="flex items-center space-x-4">
                                 <Link href="/login">
-                                    <Button variant="ghost">Log in</Button>
+                                    <Button variant="ghost" className="text-[#F00000]">Log in</Button>
                                 </Link>
                                 <Link href="/pricing">
-                                    <Button>Get Started</Button>
+                                    <Button className="text-[#F00000]">Get Started</Button>
                                 </Link>
                             </div>
                         </div>
@@ -63,9 +63,9 @@ export default function Home({ plans }: HomeProps) {
                 <section className="relative overflow-hidden pt-32 pb-20">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center">
-                            <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl md:text-6xl dark:text-white">
+                            <h1 className="text-4xl font-extrabold tracking-tight text-[#F00000] sm:text-5xl md:text-6xl">
                                 Modern HR Management
-                                <span className="block text-blue-600">Made Simple</span>
+                                <span className="block text-[#F00000]">Made Simple</span>
                             </h1>
                             <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
                                 Streamline your HR operations with Obseque HRMS. From employee management to payroll processing, 
@@ -73,12 +73,12 @@ export default function Home({ plans }: HomeProps) {
                             </p>
                             <div className="mt-10 flex items-center justify-center gap-4">
                                 <Link href="/pricing">
-                                    <Button size="lg" className="text-lg">
+                                    <Button size="lg" className="text-lg text-[#F00000]">
                                         Start Free Trial
                                     </Button>
                                 </Link>
                                 <Link href="/demo">
-                                    <Button size="lg" variant="outline" className="text-lg">
+                                    <Button size="lg" variant="outline" className="text-lg text-[#F00000]">
                                         Try Demo
                                     </Button>
                                 </Link>
@@ -91,8 +91,8 @@ export default function Home({ plans }: HomeProps) {
 
                     {/* Hero Image/Illustration Placeholder */}
                     <div className="mx-auto mt-16 max-w-5xl px-4">
-                        <div className="rounded-xl border border-slate-200 bg-slate-100 p-8 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
-                            <div className="aspect-video rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-700" />
+                        <div className="rounded-xl border border-[#8E2DE2] dark:border-[#7209B7]/30 bg-slate-100 p-8 shadow-2xl dark:bg-slate-900">
+                            <div className="aspect-video rounded-lg bg-linear-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-700 border border-[#8E2DE2] dark:border-[#7209B7]/30" />
                         </div>
                     </div>
                 </section>
@@ -101,7 +101,7 @@ export default function Home({ plans }: HomeProps) {
                 <section id="features" className="py-20 bg-white dark:bg-slate-950">
                     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="text-center">
-                            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                            <h2 className="text-3xl font-bold tracking-tight text-[#F00000] sm:text-4xl">
                                 Everything you need to manage your workforce
                             </h2>
                             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
