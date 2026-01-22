@@ -1,15 +1,68 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Building2, User, Settings, Zap, Eye, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Building2, User, Settings, Zap, BadgeCheck, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 
-import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import currencies from '@/data/currencies.json';
-import languages from '@/data/languages.json';
+
+import AdminDetailsStep from './components/onboarding/admin-details-step';
+import APISettingsStep from './components/onboarding/api-settings-step';
+import CompanyConfigStep from './components/onboarding/company-config-step';
+import CompanyDetailsStep from './components/onboarding/company-details-step';
+import OnboardingStepIndicator from './components/onboarding/onboarding-step-indicator';
+
+type WorkingDaySchedule = {
+    enabled: boolean;
+    start: string;
+    end: string;
+};
+
+type WorkingHoursSchedule = {
+    monday: WorkingDaySchedule;
+    tuesday: WorkingDaySchedule;
+    wednesday: WorkingDaySchedule;
+    thursday: WorkingDaySchedule;
+    friday: WorkingDaySchedule;
+    saturday: WorkingDaySchedule;
+    sunday: WorkingDaySchedule;
+};
+
+interface OnboardingFormData {
+    company_name: string;
+    company_logo: File | null;
+    address: string;
+    address_line_2: string;
+    city: string;
+    state: string;
+    country: string;
+    postal_code: string;
+    company_phone: string;
+    company_email: string;
+    fiscal_year_start: string;
+    currency: string;
+    first_name: string;
+    last_name: string;
+    personal_email: string;
+    work_email: string;
+    language: string;
+    password: string;
+    password_confirmation: string;
+    working_hours: WorkingHoursSchedule;
+    branch_name: string;
+    department_name: string;
+    ai_provider: string;
+    ai_model: string;
+    ai_api_key: string;
+    google_calendar_api_key: string;
+    google_meet_api_key: string;
+    smtp_host: string;
+    smtp_port: number;
+    smtp_username: string;
+    smtp_password: string;
+    smtp_encryption: string;
+    smtp_from_address: string;
+    smtp_from_name: string;
+}
 
 interface OnboardingProps {
     user: {
@@ -20,7 +73,7 @@ interface OnboardingProps {
     tenant: {
         id: string;
         name: string;
-    };
+    } | null;
     plan: {
         id: number;
         name: string;
@@ -30,14 +83,12 @@ interface OnboardingProps {
 
 export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
     const [currentStep, setCurrentStep] = useState(1);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const isProOrEnterprise = ['pro', 'enterprise'].includes(plan.slug);
 
-    const form = useForm({
+    const form = useForm<OnboardingFormData>({
         company_name: '',
-        company_logo: null as File | null,
+        company_logo: null,
         address: '',
         address_line_2: '',
         city: '',
@@ -80,14 +131,49 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
         smtp_from_name: '',
     });
 
-    const steps = [
-        { number: 1, title: 'Company Details', icon: Building2 },
-        { number: 2, title: 'Admin Details', icon: User },
-        { number: 3, title: 'Company Config', icon: Settings },
-        ...(isProOrEnterprise ? [{ number: 4, title: 'API & Settings', icon: Zap }] : []),
-    ];
+    const applyFormChange = <K extends keyof OnboardingFormData>(
+        field: K,
+        value: OnboardingFormData[K],
+    ) => {
+        form.setData((data) => ({
+            ...data,
+            [field]: value,
+        }));
+    };
 
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const handleFormChange: (field: string, value: unknown) => void = (field, value) => {
+        applyFormChange(
+            field as keyof OnboardingFormData,
+            value as OnboardingFormData[keyof OnboardingFormData],
+        );
+    };
+
+    const steps = [
+        { 
+            number: 1, 
+            title: 'Company Details', 
+            description: 'Add your company information including name, address, and basic contact details to set up your workspace.',
+            icon: Building2 
+        },
+        { 
+            number: 2, 
+            title: 'Admin Details', 
+            description: 'Set up your administrator profile with personal information, credentials, and preferred language settings.',
+            icon: User 
+        },
+        { 
+            number: 3, 
+            title: 'Company Config', 
+            description: 'Configure your working hours, departments, and organizational structure to match your business operations.',
+            icon: Settings 
+        },
+        ...(isProOrEnterprise ? [{ 
+            number: 4, 
+            title: 'API & Settings', 
+            description: 'Connect third-party services and configure API integrations for enhanced functionality and automation.',
+            icon: Zap 
+        }] : []),
+    ];
 
     const handleNext = () => {
         if (currentStep < steps.length) {
@@ -103,6 +189,12 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Only submit if on the last step
+        if (currentStep !== steps.length) {
+            return;
+        }
+        
         form.post('/onboarding/complete', {
             preserveScroll: true,
             onSuccess: () => {
@@ -117,88 +209,54 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
                 return;
             }
         }
-        form.setData('personal_email', newEmail);
+        applyFormChange('personal_email', newEmail);
     };
 
     return (
         <>
             <Head title="Complete Your Setup" />
             
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-8 px-4">
-                <div className="max-w-5xl mx-auto">
-                    {/* Welcome Header */}
-                    <div className="text-center mb-8">
-                        <div className="flex justify-center mb-4">
-                            <div className="h-16 w-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
-                                <CheckCircle2 className="h-10 w-10 text-white" />
+            <div className="min-h-screen bg-zinc-50 dark:bg-neutral-900 py-8 px-4">
+                <div className="max-w-7xl mx-auto grid grid-cols-7 gap-8">
+                    <Card className="shadow-xl col-span-7 md:col-span-3 px-8 bg-linear-to-t dark:from-neutral-900 dark:to-neutral-800 from-red-50 to-purple-50 dark:border-neutral-700 border">
+                        {/* Welcome Header */}
+                        <div className="flex gap-4 mb-8 pt-6 items-center">
+                            <div className="flex justify-center mb-4">
+                                <div className="h-8 w-8 bg-linear-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center shadow-lg">
+                                    <BadgeCheck className="h-8 w-8 text-white" />
+                                </div>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold mb-0">
+                                    Welcome, {user.name}!
+                                </h1>
+                                <p className="text-muted-foreground">
+                                    Let's get {tenant ? `the ${tenant.name}` : 'your'} workspace set up in just a few steps
+                                </p>
                             </div>
                         </div>
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                            Welcome, {user.name}! 🎉
-                        </h1>
-                        <p className="text-lg text-gray-600">
-                            Let's get your workspace set up in just a few steps
-                        </p>
-                    </div>
 
-                    {/* Progress Steps */}
-                    <div className="mb-8">
-                        <div className="flex items-center justify-between max-w-3xl mx-auto">
-                            {steps.map((step, index) => {
-                                const Icon = step.icon;
-                                const isActive = currentStep === step.number;
-                                const isCompleted = currentStep > step.number;
-
-                                return (
-                                    <div key={step.number} className="flex items-center flex-1">
-                                        <div className="flex flex-col items-center flex-1">
-                                            <div
-                                                className={`w-12 h-12 rounded-full flex items-center justify-center transition-all \${
-                                                    isActive
-                                                        ? 'bg-blue-600 text-white shadow-lg scale-110'
-                                                        : isCompleted
-                                                        ? 'bg-green-600 text-white'
-                                                        : 'bg-gray-200 text-gray-500'
-                                                }`}
-                                            >
-                                                {isCompleted ? (
-                                                    <CheckCircle2 className="h-6 w-6" />
-                                                ) : (
-                                                    <Icon className="h-6 w-6" />
-                                                )}
-                                            </div>
-                                            <span
-                                                className={`mt-2 text-sm font-medium ${
-                                                    isActive || isCompleted ? 'text-gray-900' : 'text-gray-500'
-                                                }`}
-                                            >
-                                                {step.title}
-                                            </span>
-                                        </div>
-                                        {index < steps.length - 1 && (
-                                            <div
-                                                className={`h-1 flex-1 mx-4 rounded transition-all ${
-                                                    isCompleted ? 'bg-green-600' : 'bg-gray-200'
-                                                }`}
-                                            />
-                                        )}
-                                    </div>
-                                );
-                            })}
+                        {/* Progress Steps */}
+                        <div className="mb-8">
+                            <OnboardingStepIndicator steps={steps} currentStep={currentStep} />
                         </div>
-                    </div>
+                    </Card>
 
                     {/* Form Card */}
-                    <Card className="shadow-xl">
+                    <Card className="col-span-7 md:col-span-4 bg-transparent border-0 shadow-none">
                         <CardHeader>
-                            <CardTitle className="text-2xl">
-                                Step {currentStep}: {steps[currentStep - 1].title}
+                            <CardTitle className="">
+                                <p className='text-md uppercase mb-2 font-black! text-purple-800 dark:text-purple-400'>
+                                    STEP {currentStep} OF {steps.length}
+                                </p>
+                                <h2 className='text-2xl'>
+                                    {steps[currentStep - 1].title}
+                                </h2>
+                                <div className='h-1 bg-linear-to-r from-red-500 to-purple-500 rounded-full mb-2 w-24'>
+                                </div>
                             </CardTitle>
                             <CardDescription>
-                                {currentStep === 1 && 'Tell us about your company'}
-                                {currentStep === 2 && 'Set up your admin profile'}
-                                {currentStep === 3 && 'Configure your company settings'}
-                                {currentStep === 4 && 'Optional: Configure integrations and APIs'}
+                                {steps[currentStep - 1].description}
                             </CardDescription>
                         </CardHeader>
 
@@ -206,188 +264,108 @@ export default function Onboarding({ user, tenant, plan }: OnboardingProps) {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* STEP 1: COMPANY DETAILS */}
                                 {currentStep === 1 && (
-                                    <div className="space-y-4">
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <div className="md:col-span-2">
-                                                <Label htmlFor="company_name">Company Name *</Label>
-                                                <Input
-                                                    id="company_name"
-                                                    value={form.data.company_name}
-                                                    onChange={(e) => form.setData('company_name', e.target.value)}
-                                                    required
-                                                    placeholder="Acme Corporation"
-                                                />
-                                                <InputError message={form.errors.company_name} />
-                                            </div>
+                                    <CompanyDetailsStep
+                                        formData={{
+                                            company_name: form.data.company_name,
+                                            company_logo: form.data.company_logo,
+                                            address: form.data.address,
+                                            address_line_2: form.data.address_line_2,
+                                            city: form.data.city,
+                                            state: form.data.state,
+                                            country: form.data.country,
+                                            postal_code: form.data.postal_code,
+                                            company_phone: form.data.company_phone,
+                                            company_email: form.data.company_email,
+                                            fiscal_year_start: form.data.fiscal_year_start,
+                                            currency: form.data.currency,
+                                        }}
+                                        errors={form.errors}
+                                        onChange={handleFormChange}
+                                    />
+                                )}
 
-                                            <div className="md:col-span-2">
-                                                <Label htmlFor="company_logo">Company Logo (Optional)</Label>
-                                                <Input
-                                                    id="company_logo"
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={(e) => form.setData('company_logo', e.target.files?.[0] || null)}
-                                                />
-                                                <p className="text-sm text-gray-500 mt-1">Recommended: Square image, max 2MB</p>
-                                            </div>
+                                {/* STEP 2: ADMIN DETAILS */}
+                                {currentStep === 2 && (
+                                    <AdminDetailsStep
+                                        formData={{
+                                            first_name: form.data.first_name,
+                                            last_name: form.data.last_name,
+                                            personal_email: form.data.personal_email,
+                                            work_email: form.data.work_email,
+                                            language: form.data.language,
+                                            password: form.data.password,
+                                            password_confirmation: form.data.password_confirmation,
+                                        }}
+                                        errors={form.errors}
+                                        originalEmail={user.email}
+                                        onChange={handleFormChange}
+                                        onEmailChange={handleEmailChange}
+                                    />
+                                )}
 
-                                            <div className="md:col-span-2">
-                                                <Label htmlFor="address">Address *</Label>
-                                                <Input
-                                                    id="address"
-                                                    value={form.data.address}
-                                                    onChange={(e) => form.setData('address', e.target.value)}
-                                                    required
-                                                    placeholder="123 Business Street"
-                                                />
-                                                <InputError message={form.errors.address} />
-                                            </div>
+                                {/* STEP 3: COMPANY CONFIG */}
+                                {currentStep === 3 && (
+                                    <CompanyConfigStep
+                                        formData={{
+                                            working_hours: form.data.working_hours,
+                                            branch_name: form.data.branch_name,
+                                            department_name: form.data.department_name,
+                                        }}
+                                        errors={form.errors}
+                                        onChange={handleFormChange}
+                                    />
+                                )}
 
-                                            <div className="md:col-span-2">
-                                                <Label htmlFor="address_line_2">Address Line 2</Label>
-                                                <Input
-                                                    id="address_line_2"
-                                                    value={form.data.address_line_2}
-                                                    onChange={(e) => form.setData('address_line_2', e.target.value)}
-                                                    placeholder="Suite 100"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="city">City *</Label>
-                                                <Input
-                                                    id="city"
-                                                    value={form.data.city}
-                                                    onChange={(e) => form.setData('city', e.target.value)}
-                                                    required
-                                                    placeholder="New York"
-                                                />
-                                                <InputError message={form.errors.city} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="state">State/Province *</Label>
-                                                <Input
-                                                    id="state"
-                                                    value={form.data.state}
-                                                    onChange={(e) => form.setData('state', e.target.value)}
-                                                    required
-                                                    placeholder="NY"
-                                                />
-                                                <InputError message={form.errors.state} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="country">Country *</Label>
-                                                <Input
-                                                    id="country"
-                                                    value={form.data.country}
-                                                    onChange={(e) => form.setData('country', e.target.value)}
-                                                    required
-                                                    placeholder="United States"
-                                                />
-                                                <InputError message={form.errors.country} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="postal_code">Postal Code *</Label>
-                                                <Input
-                                                    id="postal_code"
-                                                    value={form.data.postal_code}
-                                                    onChange={(e) => form.setData('postal_code', e.target.value)}
-                                                    required
-                                                    placeholder="10001"
-                                                />
-                                                <InputError message={form.errors.postal_code} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="company_phone">Company Phone *</Label>
-                                                <Input
-                                                    id="company_phone"
-                                                    type="tel"
-                                                    value={form.data.company_phone}
-                                                    onChange={(e) => form.setData('company_phone', e.target.value)}
-                                                    required
-                                                    placeholder="+1 (555) 123-4567"
-                                                />
-                                                <InputError message={form.errors.company_phone} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="company_email">Company Email *</Label>
-                                                <Input
-                                                    id="company_email"
-                                                    type="email"
-                                                    value={form.data.company_email}
-                                                    onChange={(e) => form.setData('company_email', e.target.value)}
-                                                    required
-                                                    placeholder="contact@company.com"
-                                                />
-                                                <InputError message={form.errors.company_email} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="fiscal_year_start">Fiscal Year Start *</Label>
-                                                <Select
-                                                    value={form.data.fiscal_year_start}
-                                                    onValueChange={(value) => form.setData('fiscal_year_start', value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="01-01">January 1</SelectItem>
-                                                        <SelectItem value="04-01">April 1</SelectItem>
-                                                        <SelectItem value="07-01">July 1</SelectItem>
-                                                        <SelectItem value="10-01">October 1</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                                <InputError message={form.errors.fiscal_year_start} />
-                                            </div>
-
-                                            <div>
-                                                <Label htmlFor="currency">Currency *</Label>
-                                                <Select
-                                                    value={form.data.currency}
-                                                    onValueChange={(value) => form.setData('currency', value)}
-                                                >
-                                                    <SelectTrigger>
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent className="max-h-60">
-                                                        {currencies.map((currency) => (
-                                                            <SelectItem key={currency.code} value={currency.code}>
-                                                                {currency.code} - {currency.name} ({currency.symbol})
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <InputError message={form.errors.currency} />
-                                            </div>
-                                        </div>
-                                    </div>
+                                {/* STEP 4: API & SETTINGS (Pro/Enterprise Only) */}
+                                {currentStep === 4 && isProOrEnterprise && (
+                                    <APISettingsStep
+                                        formData={{
+                                            ai_provider: form.data.ai_provider,
+                                            ai_model: form.data.ai_model,
+                                            ai_api_key: form.data.ai_api_key,
+                                            google_calendar_api_key: form.data.google_calendar_api_key,
+                                            google_meet_api_key: form.data.google_meet_api_key,
+                                            smtp_host: form.data.smtp_host,
+                                            smtp_port: form.data.smtp_port,
+                                            smtp_username: form.data.smtp_username,
+                                            smtp_password: form.data.smtp_password,
+                                            smtp_encryption: form.data.smtp_encryption,
+                                            smtp_from_address: form.data.smtp_from_address,
+                                            smtp_from_name: form.data.smtp_from_name,
+                                        }}
+                                        onChange={handleFormChange}
+                                    />
                                 )}
 
                                 {/* Navigation Buttons */}
-                                <div className="flex justify-between pt-6 border-t">
-                                    {currentStep > 1 && (
-                                        <Button type="button" variant="outline" onClick={handleBack}>
-                                            Back
+                                <div className="flex justify-between pt-6">
+                                    <Button
+                                        type="button"
+                                        className='bg-primary dark:bg-red-500 dark:text-primary dark:hover:bg-red-600 transition-colors duration-200'
+                                        onClick={handleBack}
+                                        disabled={currentStep === 1}
+                                    >
+                                        <ArrowLeft className="h-4 w-4" />
+                                        Back
+                                    </Button>
+
+                                    {currentStep < steps.length ? (
+                                        <Button 
+                                            type="button" 
+                                            onClick={handleNext} 
+                                            className='bg-blue-700 hover:bg-blue-600 dark:bg-primary dark:hover:bg-zinc-200 transition-colors duration-200'
+                                        >
+                                            Save & Continue
+                                        </Button>
+                                    ) : (
+                                        <Button 
+                                            type="submit" 
+                                            disabled={form.processing}
+                                            className='bg-green-700 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 transition-colors duration-200'
+                                        >
+                                            {form.processing ? 'Completing...' : 'Complete Setup'}
                                         </Button>
                                     )}
-                                    
-                                    <div className="ml-auto flex gap-2">
-                                        {currentStep < steps.length ? (
-                                            <Button type="button" onClick={handleNext}>
-                                                Next
-                                            </Button>
-                                        ) : (
-                                            <Button type="submit" disabled={form.processing}>
-                                                {form.processing ? 'Completing...' : 'Complete Setup'}
-                                            </Button>
-                                        )}
-                                    </div>
                                 </div>
                             </form>
                         </CardContent>
