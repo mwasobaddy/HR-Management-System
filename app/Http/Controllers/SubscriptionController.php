@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CompanyProfile;
 use App\Models\SubscriptionPlan;
-use App\Models\Tenant;
-use App\Models\User;
-use Stancl\Tenancy\Database\Models\Domain;
-use App\Notifications\WelcomeCredentials;
+use App\Rules\UniqueTenantDomain;
+use App\Services\TenantCreationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class SubscriptionController extends Controller
 {
+    protected TenantCreationService $tenantService;
+
+    public function __construct(TenantCreationService $tenantService)
+    {
+        $this->tenantService = $tenantService;
+    }
+
     /**
-     * Show subscription form for a specific plan
+     * Show subscription form for a specific plan.
      */
     public function show(Request $request)
     {
@@ -46,9 +47,38 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Process subscription and create tenant
+     * Process subscription and create tenant.
      */
     public function store(Request $request)
+    {
+        $validated = $this->validateSubscription($request);
+        
+        try {
+            $tenant = $this->tenantService->createTenant($validated);
+
+            return redirect('/login')->with('success', 'Account created! Check your email for login credentials.');
+
+        } catch (\Exception $e) {
+            \Log::error('Tenant creation failed', [
+                'email' => $validated['email'],
+                'domain' => $validated['domain'],
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Failed to create account. Please try again or contact support.']);
+        }
+    }
+
+    /**
+     * Validate subscription request.
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function validateSubscription(Request $request): array
     {
         $validated = $request->validate([
             'plan_id' => 'required|exists:subscription_plans,id',
@@ -58,12 +88,7 @@ class SubscriptionController extends Controller
                 'string',
                 'max:255',
                 'regex:/^[a-zA-Z0-9\-]+$/',
-                function ($attribute, $value, $fail) {
-                    $fullDomain = $value . '.hrms.test';
-                    if (Domain::where('domain', $fullDomain)->exists()) {
-                        $fail('This domain is already taken.');
-                    }
-                },
+                new UniqueTenantDomain(),
             ],
             'email' => 'required|string|email|max:255|unique:users',
             'admin_name' => 'required|string|max:255',
@@ -73,10 +98,10 @@ class SubscriptionController extends Controller
             'cvv' => 'nullable|string|max:4',
         ]);
 
-        $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
-
         // Validate payment info for paid plans
-        if ($plan->price > 0) {
+        $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
+        
+        if (!$plan->isFree()) {
             $request->validate([
                 'payment_type' => 'required|in:recurring,one-time',
                 'card_number' => 'required|string|max:19',
@@ -85,65 +110,6 @@ class SubscriptionController extends Controller
             ]);
         }
 
-        // Generate random password
-        $randomPassword = Str::random(12);
-
-        DB::beginTransaction();
-        try {
-            // Create tenant
-            $tenant = Tenant::create([
-                'id' => Str::uuid(),
-                'company_name' => $validated['company_name'],
-                'slug' => $validated['domain'],
-                'plan_id' => $plan->id,
-                'subscription_status' => $plan->price == 0 ? 'trial' : 'active',
-                'trial_ends_at' => $plan->price == 0 ? now()->addDays(14) : null,
-                'subscription_ends_at' => $plan->price > 0 ? now()->addMonth() : null,
-                'subscription_type' => $validated['payment_type'] ?? null,
-                'database_type' => $plan->database_type,
-                'onboarding_completed' => false,
-                'is_demo' => false,
-            ]);
-
-            // Create domain
-            $tenant->domains()->create([
-                'domain' => $validated['domain'] . '.hrms.test',
-            ]);
-
-            // Initialize tenant context
-            tenancy()->initialize($tenant);
-
-            // Create admin user with random password
-            $user = User::create([
-                'tenant_id' => $tenant->id,
-                'name' => $validated['admin_name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($randomPassword),
-                'role' => 'admin',
-                'employee_id' => 'EMP001',
-                'is_active' => true,
-            ]);
-
-            // Create company profile
-            CompanyProfile::create([
-                'tenant_id' => $tenant->id,
-                'company_name' => $validated['company_name'],
-                'timezone' => 'UTC',
-                'currency' => 'USD',
-                'work_hours' => '08:00-17:00',
-                'work_days' => ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-            ]);
-
-            // Send welcome email with credentials
-            $user->notify(new WelcomeCredentials($randomPassword, $tenant));
-
-            DB::commit();
-
-            return redirect('/login')->with('success', 'Account created! Check your email for login credentials.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to create account: ' . $e->getMessage()]);
-        }
+        return $validated;
     }
 }
