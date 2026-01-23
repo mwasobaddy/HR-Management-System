@@ -96,15 +96,19 @@ class TenantCreationService
      */
     protected function createAdminUser(Tenant $tenant, array $data, string $password): User
     {
-        return User::create([
+        $user = User::create([
             'tenant_id' => $tenant->id,
             'name' => $data['admin_name'],
             'email' => $data['email'],
             'password' => Hash::make($password),
-            'role' => 'admin',
             'employee_id' => 'EMP001',
             'is_active' => true,
         ]);
+
+        // Assign super-admin role
+        $user->assignRole('super-admin');
+
+        return $user;
     }
 
     /**

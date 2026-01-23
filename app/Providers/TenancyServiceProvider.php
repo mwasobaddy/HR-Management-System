@@ -33,6 +33,16 @@ class TenancyServiceProvider extends ServiceProvider
                 //     return $event->tenant;
                 // })->shouldBeQueued(false),
 
+                // Seed permissions and roles for the tenant
+                function (Events\TenantCreated $event) {
+                    $event->tenant->run(function () {
+                        \Artisan::call('db:seed', [
+                            '--class' => 'TenantPermissionsSeeder',
+                            '--force' => true
+                        ]);
+                    });
+                },
+
                 // Your own jobs to prepare the tenant.
                 // Provision API keys, create S3 buckets, send welcome emails, etc.
             ],
