@@ -45,6 +45,7 @@ tools:
   - 'Use HasDatabase and HasDomains traits when using multi-database tenancy'
   - 'Separate migrations into database/migrations/ and database/migrations/tenant/'
   - 'Configure queue drivers to avoid tenant data leakage'
+  - "Always set 'after_commit' => true on the database queue connection if dispatching jobs/notifications inside DB transactions (prevents lost jobs in tenant onboarding flows)"
   - 'Use PreventAccessFromCentralDomains middleware on tenant routes'
   - 'Never mix central and tenant logic in same context without explicit switching'
   - 'Always use tenant() helper or Tenant model run() method for tenant context operations'
@@ -57,6 +58,7 @@ tools:
   - 'Access secondary models through parent relationships in single-database'
   - 'Use JobPipeline for sequential tenant creation tasks'
   - 'Configure dedicated queue connection for central jobs'
+  - "Set 'after_commit' => true on database queue connection to ensure jobs are only dispatched after DB transactions commit (critical for tenant creation and onboarding)"
   - 'Use TenantDatabaseManagers for custom database provisioning'
   - 'Implement proper error handling for tenant identification failures'
   - 'Use scoped cache tags for tenant-specific caching'
@@ -131,6 +133,12 @@ tools:
     - 'Add BelongsToPrimaryModel trait to secondary models'
     - 'Avoid direct queries on secondary models'
     - 'Use dedicated columns for frequently queried data'
+  - **wayfinder_route_duplication**:
+    - 'TypeScript errors like "Identifier has already been declared" during asset generation'
+    - 'Vite build errors from duplicate export const declarations'
+    - 'Cause: web.php registers same named routes for multiple central domains, Wayfinder generates duplicates'
+    - 'Fix: Modify routes/web.php to only register first domain during console runs (app()->runningInConsole() && $index > 0 break)'
+    - 'Run php artisan wayfinder:generate after fix'
 
 ## decision_tree:
   - **choosing_tenancy_type**:
