@@ -33,16 +33,7 @@ class TenancyServiceProvider extends ServiceProvider
                 //     return $event->tenant;
                 // })->shouldBeQueued(false),
 
-                // Seed permissions and roles for the tenant
-                function (Events\TenantCreated $event) {
-                    $event->tenant->run(function () {
-                        \Artisan::call('db:seed', [
-                            '--class' => 'TenantPermissionsSeeder',
-                            '--force' => true
-                        ]);
-                    });
-                },
-
+                // Permissions and roles are seeded once in central database for single-database tenancy
                 // Your own jobs to prepare the tenant.
                 // Provision API keys, create S3 buckets, send welcome emails, etc.
             ],
@@ -96,6 +87,11 @@ class TenancyServiceProvider extends ServiceProvider
 
             // Fired only when a synced resource is changed in a different DB than the origin DB (to avoid infinite loops)
             Events\SyncedResourceChangedInForeignDatabase::class => [],
+
+            // Authentication events
+            \Illuminate\Auth\Events\Login::class => [
+                \App\Listeners\AutoVerifyEmailOnLogin::class,
+            ],
         ];
     }
 

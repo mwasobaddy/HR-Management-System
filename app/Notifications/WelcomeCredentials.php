@@ -36,28 +36,26 @@ class WelcomeCredentials extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $verificationUrl = URL::temporarySignedRoute(
-            'verification.verify',
+        $loginUrl = URL::temporarySignedRoute(
+            'auth.login',
             now()->addMinutes(60),
             [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
+                'user_id' => $notifiable->getKey(),
             ]
         );
 
         return (new MailMessage)
-            ->subject('Welcome to ' . config('app.name') . ' - Your Account Credentials')
-            ->greeting('Hello ' . $notifiable->name . '!')
-            ->line('Welcome to ' . config('app.name') . '! Your account has been successfully created for **' . $this->tenant->name . '**.')
+            ->subject('Welcome to '.config('app.name').' - Your Account is Ready')
+            ->greeting('Hello '.$notifiable->name.'!')
+            ->line('Welcome to '.config('app.name').'! Your account has been successfully created for **'.$this->tenant->company_name.'**.')
             ->line('Here are your login credentials:')
-            ->line('**Email:** ' . $notifiable->email)
-            ->line('**Password:** ' . $this->password)
-            ->line('Please verify your email address by clicking the button below:')
-            ->action('Verify Email Address', $verificationUrl)
-            ->line('After verification, you can log in and change your password from your profile settings.')
+            ->line('**Email:** '.$notifiable->email)
+            ->line('**Password:** '.$this->password)
+            ->line('Click the button below to log in to your account:')
+            ->action('Log In to Your Account', $loginUrl)
             ->line('For security reasons, we recommend changing your password after your first login.')
             ->line('If you have any questions, feel free to reach out to our support team.')
-            ->salutation('Thank you for choosing ' . config('app.name') . '!');
+            ->salutation('Thank you for choosing '.config('app.name').'!');
     }
 
     /**
