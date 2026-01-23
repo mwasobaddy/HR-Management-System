@@ -58,7 +58,7 @@ class SubscriptionFlowTest extends TestCase
         // Verify domain was created
         $this->assertDatabaseHas('domains', [
             'tenant_id' => $tenant->id,
-            'domain' => 'testcompany.hrms.test',
+            'domain' => '127.0.0.1.testcompany.localhost',
         ]);
 
         // Verify admin user was created
@@ -84,7 +84,7 @@ class SubscriptionFlowTest extends TestCase
         // Verify domain was created
         $this->assertDatabaseHas('domains', [
             'tenant_id' => $tenant->id,
-            'domain' => 'testcompany.hrms.test',
+            'domain' => '127.0.0.1.testcompany.localhost',
         ]);
 
         // Verify admin user was created

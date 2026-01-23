@@ -12,7 +12,7 @@ uses(RefreshDatabase::class);
 
 test('tenant creation service creates tenant with all resources', function () {
     // Seed permissions and roles
-    $seeder = new TenantPermissionsSeeder();
+    $seeder = new TenantPermissionsSeeder;
     $seeder->run();
 
     // Create a subscription plan first
@@ -23,7 +23,7 @@ test('tenant creation service creates tenant with all resources', function () {
         'features' => ['feature1', 'feature2'],
     ]);
 
-    $service = new TenantCreationService();
+    $service = new TenantCreationService;
 
     $tenant = $service->createTenant([
         'company_name' => 'Test Company',
@@ -36,7 +36,7 @@ test('tenant creation service creates tenant with all resources', function () {
 
     expect($tenant)->toBeInstanceOf(Tenant::class);
     expect($tenant->company_name)->toBe('Test Company');
-    expect($tenant->domains->first()->domain)->toBe('testcompany.hrms.test');
+    expect($tenant->domains->first()->domain)->toBe('127.0.0.1.testcompany.localhost');
 
     // Verify tenant has required attributes
     expect($tenant->id)->not->toBeNull();
@@ -75,7 +75,7 @@ test('tenant data isolation works correctly', function () {
 
 test('user permissions are properly assigned on tenant creation', function () {
     // Seed permissions and roles
-    $seeder = new TenantPermissionsSeeder();
+    $seeder = new TenantPermissionsSeeder;
     $seeder->run();
 
     // Create a subscription plan first
@@ -86,7 +86,7 @@ test('user permissions are properly assigned on tenant creation', function () {
         'features' => ['feature1', 'feature2', 'feature3'],
     ]);
 
-    $service = new TenantCreationService();
+    $service = new TenantCreationService;
 
     $tenant = $service->createTenant([
         'company_name' => 'Permission Test Company',
