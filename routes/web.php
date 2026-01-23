@@ -5,10 +5,16 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\Unauth\PublicController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Laravel\Fortify\Features;
 
 // Wrap central routes in domain groups for Laravel 12
-foreach (config('tenancy.central_domains') as $domain) {
+$centralDomains = config('tenancy.central_domains', []);
+foreach ($centralDomains as $index => $domain) {
+    // When running artisan (e.g. wayfinder:generate), register routes for only the first domain
+    // to avoid duplicate named routes being generated for each domain (causes TypeScript redeclaration errors).
+    if (app()->runningInConsole() && $index > 0) {
+        break;
+    }
+
     Route::domain($domain)->group(function () {
         // Public pages
         Route::get('/', [PublicController::class, 'home'])->name('home');
@@ -18,7 +24,14 @@ foreach (config('tenancy.central_domains') as $domain) {
 
         // Subscription flow (public)
         Route::get('/subscribe', [SubscriptionController::class, 'show'])->name('subscribe');
-        Route::post('/subscribe', [SubscriptionController::class, 'store'])->name('subscribe.store');
+        Route::post('/subscribe', [SubscriptionController::class, 'store'])
+            ->middleware('throttle:3,1')
+            ->name('subscribe.store');
+
+        // Direct login via signed URL
+        Route::get('/auth/login/{user_id}', [\App\Http\Controllers\Auth\AuthController::class, 'login'])
+            ->name('auth.login')
+            ->middleware('signed');
 
         // Authenticated routes
         Route::middleware(['auth', 'verified', 'onboarding'])->group(function () {
