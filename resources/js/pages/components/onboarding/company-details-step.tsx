@@ -153,7 +153,7 @@ export default function CompanyDetailsStep({ formData, errors, onChange }: Compa
                         onValueChange={(value) => onChange('fiscal_year_start', value)}
                     >
                         <SelectTrigger>
-                            <SelectValue Placeholder="Select a date"/>
+                            <SelectValue placeholder="Select a date"/>
                         </SelectTrigger>
                         <SelectContent>
                                 <SelectItem value="01-01">January 1</SelectItem>

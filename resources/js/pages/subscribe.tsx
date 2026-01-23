@@ -111,7 +111,7 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                                 <InputError message={errors.company_name} />
                                             </div>
                                             <div className="grid gap-2">
-                                                <Label htmlFor="domain">Domain Name *</Label>
+                                                <Label htmlFor="domain">Your Custom Domain *</Label>
                                                 <Input
                                                     id="domain"
                                                     name="domain"
@@ -120,7 +120,10 @@ export default function Subscribe({ plan }: { plan: SubscriptionPlan }) {
                                                     placeholder="yourcompany"
                                                 />
                                                 <p className="text-sm text-blue-600">
-                                                    This will be your login URL: yourcompany.hrms.test
+                                                    Choose your unique subdomain. Your login URL will be: <strong>yourcompany.localhost</strong>
+                                                </p>
+                                                <p className="text-sm text-amber-600">
+                                                    ⚠️ This domain cannot be changed later. Choose carefully.
                                                 </p>
                                                 <InputError message={errors.domain} />
                                             </div>
