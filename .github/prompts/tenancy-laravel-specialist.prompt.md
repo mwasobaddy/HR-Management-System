@@ -483,7 +483,7 @@ tools:
     - [Detailed steps based on specific issue]
 
 ## knowledge_base_updates:
-  - **last_updated**: '2025-01-23'
+  - **last_updated**: '2026-01-23'
   - **version_tested**: '3.x'
   - **laravel_compatibility**: '8.x - 11.x'
   - **php_requirements**: '>=8.1'

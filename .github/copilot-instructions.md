@@ -2808,6 +2808,23 @@ With `QueueTenancyBootstrapper`, jobs dispatched from tenant context are automat
 ### Important Considerations
 
 #### Database Queue Driver
+
+Force database queue to use central connection:
+```php
+// config/queue.php
+'connections' => [
+    'database' => [
+        'driver' => 'database',
+        'connection' => 'central',
+        'after_commit' => true, // CRITICAL: Prevents lost jobs when dispatching inside DB transactions
+        // ...
+    ],
+],
+```
+
+**Why 'after_commit' matters:**
+If you dispatch queued jobs (including notifications) inside a database transaction, you must set `'after_commit' => true` on your queue connection. Otherwise, jobs may never be created if the transaction is not committed, leading to lost or missing jobs. This is especially important in multi-tenant applications where tenant creation and onboarding often use transactions.
+
 Force database queue to use central connection:
 ```php
 // config/queue.php
@@ -3299,6 +3316,35 @@ Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains
 - Add `BelongsToPrimaryModel` trait to secondary models
 - Avoid direct queries on secondary models
 - Access through parent relationships
+
+### Issue: Wayfinder Route Duplication
+**Symptoms:**
+- TypeScript errors like "Identifier 'home' has already been declared"
+- Vite build errors during asset generation
+- Duplicate export const declarations in generated route files
+
+**Cause:**
+Wayfinder generates duplicate named route exports because `routes/web.php` registers the same named routes inside a domain loop for multiple central domains. This creates multiple `export const home` declarations, causing TypeScript redeclaration errors.
+
+**Solution:**
+Modify `routes/web.php` to only register routes for the first domain during console runs (asset generation):
+
+```php
+$centralDomains = config('tenancy.central_domains', []);
+foreach ($centralDomains as $index => $domain) {
+    if (app()->runningInConsole() && $index > 0) {
+        break; // Only register first domain during console runs
+    }
+    Route::domain($domain)->group(function () {
+        // Your routes here
+    });
+}
+```
+
+**Why this works:**
+- Console runs (like `php artisan wayfinder:generate` or `npm run dev`) only register the first domain, preventing duplicate exports
+- Runtime HTTP requests still register routes for all domains, preserving full application behavior
+- Regenerate Wayfinder outputs after the change: `php artisan wayfinder:generate`
 
 ## Advanced Topics
 
