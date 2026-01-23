@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Stancl\Tenancy\Database\Models\Domain;
 use App\Models\Tenant;
+use Stancl\Tenancy\Database\Models\Domain;
 
 return [
     'tenant_model' => Tenant::class,
@@ -19,8 +19,21 @@ return [
     'central_domains' => [
         '127.0.0.1',
         'localhost',
-        'hrms.obseque.com', // Production domain
     ],
+
+    // Fallback base domain used for tenant URLs
+    'tenant_base_domain' => env('TENANT_BASE_DOMAIN', 'hrms.test'),
+
+    // Environment-specific tenant base domains
+    'tenant_local_base_domain' => env('TENANT_LOCAL_BASE_DOMAIN', 'localhost'),
+    'tenant_production_base_domain' => env('TENANT_PRODUCTION_BASE_DOMAIN', 'obhrms.com'),
+
+    // Optional prefix added in front of the tenant domain when running locally (e.g. 127.0.0.1)
+    'tenant_local_prefix' => env('TENANT_LOCAL_PREFIX', '127.0.0.1'),
+
+    // Scheme & port used when generating tenant URLs (falls back to app.url values if not set)
+    'tenant_url_scheme' => env('TENANT_URL_SCHEME', 'http'),
+    'tenant_url_port' => env('TENANT_URL_PORT', null),
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
