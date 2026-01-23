@@ -144,7 +144,7 @@ return [
     */
 
     'features' => [
-        Features::registration(),
+        // Features::registration(), // Disabled - tenants create their own users
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::twoFactorAuthentication([
