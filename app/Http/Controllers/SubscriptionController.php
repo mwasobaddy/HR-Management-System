@@ -23,14 +23,14 @@ class SubscriptionController extends Controller
     public function show(Request $request)
     {
         $planId = $request->query('plan');
-        
-        if (!$planId) {
+
+        if (! $planId) {
             return redirect('/billing')->with('error', 'Please select a plan first.');
         }
 
         $plan = SubscriptionPlan::find($planId);
 
-        if (!$plan) {
+        if (! $plan) {
             return redirect('/billing')->with('error', 'Invalid plan selected.');
         }
 
@@ -42,7 +42,7 @@ class SubscriptionController extends Controller
                 'billing_cycle' => 'month',
                 'max_users' => $plan->max_users,
                 'features' => $plan->features ?? [],
-            ]
+            ],
         ]);
     }
 
@@ -52,18 +52,20 @@ class SubscriptionController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateSubscription($request);
-        
+
         try {
             $tenant = $this->tenantService->createTenant($validated);
 
-            return redirect('/login')->with('success', 'Account created! Check your email for login credentials.');
+            return redirect('/login')->with('success', 'Account created! Check your email for login instructions.');
 
         } catch (\Exception $e) {
-            \Log::error('Tenant creation failed', [
+            // Log the error for debugging, but use warning level for expected business errors
+            \Log::warning('Tenant creation failed', [
                 'email' => $validated['email'],
                 'domain' => $validated['domain'],
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                // Only include full trace in local/development environments
+                'trace' => app()->environment(['local', 'development']) ? $e->getTraceAsString() : null,
             ]);
 
             return back()
@@ -74,9 +76,6 @@ class SubscriptionController extends Controller
 
     /**
      * Validate subscription request.
-     *
-     * @param Request $request
-     * @return array
      */
     protected function validateSubscription(Request $request): array
     {
@@ -88,7 +87,7 @@ class SubscriptionController extends Controller
                 'string',
                 'max:255',
                 'regex:/^[a-zA-Z0-9\-]+$/',
-                new UniqueTenantDomain(),
+                new UniqueTenantDomain,
             ],
             'email' => 'required|string|email|max:255|unique:users',
             'admin_name' => 'required|string|max:255',
@@ -100,8 +99,8 @@ class SubscriptionController extends Controller
 
         // Validate payment info for paid plans
         $plan = SubscriptionPlan::findOrFail($validated['plan_id']);
-        
-        if (!$plan->isFree()) {
+
+        if (! $plan->isFree()) {
             $request->validate([
                 'payment_type' => 'required|in:recurring,one-time',
                 'card_number' => 'required|string|max:19',

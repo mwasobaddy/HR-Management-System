@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
+use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 use Stancl\Tenancy\DatabaseConfig;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
@@ -24,6 +24,28 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'onboarding_completed' => 'boolean',
         'is_demo' => 'boolean',
     ];
+
+    /**
+     * Define custom columns that should be stored as real database columns
+     * instead of in the data JSON column.
+     */
+    public static function getCustomColumns(): array
+    {
+        return [
+            'id',
+            'slug',
+            'company_name',
+            'plan_id',
+            'subscription_status',
+            'trial_ends_at',
+            'subscription_ends_at',
+            'subscription_type',
+            'onboarding_completed',
+            'database_type',
+            'database_name',
+            'is_demo',
+        ];
+    }
 
     /**
      * Get the subscription plan for the tenant.
@@ -46,8 +68,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function isOnTrial(): bool
     {
-        return $this->subscription_status === 'trial' 
-            && $this->trial_ends_at 
+        return $this->subscription_status === 'trial'
+            && $this->trial_ends_at
             && $this->trial_ends_at->isFuture();
     }
 
@@ -56,7 +78,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function isActive(): bool
     {
-        return $this->subscription_status === 'active' 
+        return $this->subscription_status === 'active'
             && ($this->subscription_ends_at === null || $this->subscription_ends_at->isFuture());
     }
 
@@ -77,11 +99,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function hasFeature(string $feature): bool
     {
-        if (!$this->plan) {
+        if (! $this->plan) {
             return false;
         }
 
-        return $this->plan->{'has_' . $feature} ?? false;
+        return $this->plan->{'has_'.$feature} ?? false;
     }
 
     /**
@@ -97,7 +119,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function hasReachedUserLimit(): bool
     {
-        if (!$this->plan || $this->plan->max_users === -1) {
+        if (! $this->plan || $this->plan->max_users === -1) {
             return false;
         }
 
@@ -109,7 +131,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function canAddUsers(int $count = 1): bool
     {
-        if (!$this->plan || $this->plan->max_users === -1) {
+        if (! $this->plan || $this->plan->max_users === -1) {
             return true;
         }
 
@@ -121,7 +143,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function hasReachedJobPostLimit(): bool
     {
-        if (!$this->plan || $this->plan->max_job_posts === -1) {
+        if (! $this->plan || $this->plan->max_job_posts === -1) {
             return false;
         }
 
@@ -143,11 +165,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
      */
     public function getDaysRemaining(): ?int
     {
-        $endDate = $this->subscription_status === 'trial' 
-            ? $this->trial_ends_at 
+        $endDate = $this->subscription_status === 'trial'
+            ? $this->trial_ends_at
             : $this->subscription_ends_at;
 
-        if (!$endDate) {
+        if (! $endDate) {
             return null;
         }
 
@@ -200,9 +222,9 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         $config = new DatabaseConfig($this);
 
         if ($this->database_type === 'shared') {
-            $config->name = config('database.connections.' . config('tenancy.database.central_connection') . '.database');
+            $config->name = config('database.connections.'.config('tenancy.database.central_connection').'.database');
         } else {
-            $config->name = $this->database_name ?? config('tenancy.database.prefix') . $this->id . config('tenancy.database.suffix');
+            $config->name = $this->database_name ?? config('tenancy.database.prefix').$this->id.config('tenancy.database.suffix');
         }
 
         return $config;
