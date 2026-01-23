@@ -16,8 +16,6 @@ class TenantCreationService
     /**
      * Create a new tenant with all required resources.
      *
-     * @param array $data
-     * @return Tenant
      * @throws \Exception
      */
     public function createTenant(array $data): Tenant
@@ -50,10 +48,6 @@ class TenantCreationService
 
     /**
      * Create the tenant record.
-     *
-     * @param array $data
-     * @param SubscriptionPlan $plan
-     * @return Tenant
      */
     protected function createTenantRecord(array $data, SubscriptionPlan $plan): Tenant
     {
@@ -64,7 +58,7 @@ class TenantCreationService
             'plan_id' => $plan->id,
             'subscription_status' => $plan->isFree() ? 'trial' : 'active',
             'trial_ends_at' => $plan->isFree() ? now()->addDays(14) : null,
-            'subscription_ends_at' => !$plan->isFree() ? now()->addMonth() : null,
+            'subscription_ends_at' => ! $plan->isFree() ? now()->addMonth() : null,
             'subscription_type' => $data['payment_type'] ?? null,
             'database_type' => $plan->database_type,
             'onboarding_completed' => false,
@@ -74,25 +68,53 @@ class TenantCreationService
 
     /**
      * Create tenant domain.
-     *
-     * @param Tenant $tenant
-     * @param string $subdomain
-     * @return void
      */
     protected function createTenantDomain(Tenant $tenant, string $subdomain): void
     {
         $tenant->domains()->create([
-            'domain' => $subdomain . '.hrms.test',
+            'domain' => $this->buildTenantDomain($subdomain),
         ]);
     }
 
     /**
+     * Build the fully qualified tenant domain using configured base and optional local prefix.
+     */
+    protected function buildTenantDomain(string $subdomain): string
+    {
+        $baseDomain = $this->resolveBaseDomain();
+        $localPrefix = $this->resolveLocalPrefix();
+
+        $segments = array_filter([
+            $localPrefix,
+            $subdomain,
+            $baseDomain,
+        ]);
+
+        return implode('.', $segments);
+    }
+
+    protected function resolveBaseDomain(): string
+    {
+        if (app()->environment('production')) {
+            return ltrim((string) (config('tenancy.tenant_production_base_domain') ?: config('tenancy.tenant_base_domain')), '.');
+        }
+
+        return ltrim((string) (config('tenancy.tenant_local_base_domain') ?: config('tenancy.tenant_base_domain')), '.');
+    }
+
+    protected function resolveLocalPrefix(): ?string
+    {
+        if (app()->environment('production')) {
+            return null;
+        }
+
+        $prefix = trim((string) (config('tenancy.tenant_local_prefix') ?? ''));
+
+        return $prefix !== '' ? $prefix : null;
+    }
+
+    /**
      * Create admin user for tenant.
-     *
-     * @param Tenant $tenant
-     * @param array $data
-     * @param string $password
-     * @return User
      */
     protected function createAdminUser(Tenant $tenant, array $data, string $password): User
     {
@@ -113,10 +135,6 @@ class TenantCreationService
 
     /**
      * Create company profile for tenant.
-     *
-     * @param Tenant $tenant
-     * @param string $companyName
-     * @return CompanyProfile
      */
     protected function createCompanyProfile(Tenant $tenant, string $companyName): CompanyProfile
     {
