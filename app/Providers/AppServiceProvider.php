@@ -24,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureViewNamespaces();
     }
 
     protected function configureDefaults(): void
@@ -43,5 +44,10 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null
         );
+    }
+
+    protected function configureViewNamespaces(): void
+    {
+        $this->loadViewsFrom(resource_path('views/errors'), 'errors');
     }
 }
