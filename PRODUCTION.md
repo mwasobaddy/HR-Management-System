@@ -13,8 +13,8 @@ Set these in `.env` for production:
 - `TENANT_URL_PORT=` (leave blank unless you serve on a non-standard port)
 
 Local/dev suggestions (optional, for subdomain-first hostnames):
-- Use a wildcard-friendly base like `lvh.me` or `127.0.0.1.nip.io`.
-- Example: `TENANT_LOCAL_BASE_DOMAIN=lvh.me`, `TENANT_LOCAL_PREFIX=` (empty), so `obseque.lvh.me:8000` works locally.
+- Use a wildcard-friendly base like `hrm.com` or `127.0.0.1.nip.io`.
+- Example: `TENANT_LOCAL_BASE_DOMAIN=hrm.com`, `TENANT_LOCAL_PREFIX=` (empty), so `obseque.hrm.com:8000` works locally.
 
 ## Tenant Domains
 - Each tenant must have a Domain record storing the full hostname you want to serve (e.g., `obseque.obhrm.com`).
