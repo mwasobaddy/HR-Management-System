@@ -36,7 +36,7 @@ test('tenant creation service creates tenant with all resources', function () {
 
     expect($tenant)->toBeInstanceOf(Tenant::class);
     expect($tenant->company_name)->toBe('Test Company');
-    expect($tenant->domains->first()->domain)->toBe('127.0.0.1.testcompany.localhost');
+    expect($tenant->domains->first()->domain)->toBe('testcompany.lvh.me');
 
     // Verify tenant has required attributes
     expect($tenant->id)->not->toBeNull();
