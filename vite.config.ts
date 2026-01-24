@@ -24,4 +24,15 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    server: {
+        host: true,
+        cors: {
+            origin: [/^https?:\/\/(.+\.)?lvh\.me(:\d+)?$/],
+            credentials: true,
+        },
+        hmr: {
+            host: 'lvh.me',
+            protocol: 'ws',
+        },
+    },
 });
