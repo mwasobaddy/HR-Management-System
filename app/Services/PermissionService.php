@@ -48,6 +48,7 @@ class PermissionService
         // Define roles and their permissions
         $roles = [
             'super-admin' => $permissions, // All permissions
+            'tech-admin' => $permissions, // All permissions (for system owner)
             'admin' => [
                 'view users', 'create users', 'edit users',
                 'view departments', 'create departments', 'edit departments', 'delete departments',
@@ -128,10 +129,10 @@ class PermissionService
     {
         $role = Role::firstOrCreate([
             'name' => $name,
-            'guard_name' => 'web'
+            'guard_name' => 'web',
         ]);
 
-        if (!empty($permissions)) {
+        if (! empty($permissions)) {
             $role->syncPermissions($permissions);
         }
 
