@@ -5,31 +5,35 @@ namespace Tests\Feature\Settings;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Tests\TestCase;
+use Tests\TenantTestCase;
 
-class PasswordUpdateTest extends TestCase
+class PasswordUpdateTest extends TenantTestCase
 {
     use RefreshDatabase;
 
+    protected bool $tenancy = true;
+
     public function test_password_update_page_is_displayed()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
-            ->get(route('user-password.edit'));
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->get(route('user-password.edit', [], false));
 
         $response->assertOk();
     }
 
     public function test_password_can_be_updated()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
+            ->withServerVariables($this->tenantRequestHeaders())
             ->from(route('user-password.edit'))
-            ->put(route('user-password.update'), [
+            ->put(route('user-password.update', [], false), [
                 'current_password' => 'password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',
@@ -44,12 +48,13 @@ class PasswordUpdateTest extends TestCase
 
     public function test_correct_password_must_be_provided_to_update_password()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
+            ->withServerVariables($this->tenantRequestHeaders())
             ->from(route('user-password.edit'))
-            ->put(route('user-password.update'), [
+            ->put(route('user-password.update', [], false), [
                 'current_password' => 'wrong-password',
                 'password' => 'new-password',
                 'password_confirmation' => 'new-password',

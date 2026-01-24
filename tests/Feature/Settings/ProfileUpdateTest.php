@@ -4,30 +4,34 @@ namespace Tests\Feature\Settings;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\TenantTestCase;
 
-class ProfileUpdateTest extends TestCase
+class ProfileUpdateTest extends TenantTestCase
 {
     use RefreshDatabase;
 
+    protected bool $tenancy = true;
+
     public function test_profile_page_is_displayed()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
-            ->get(route('profile.edit'));
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->get(route('profile.edit', [], false));
 
         $response->assertOk();
     }
 
     public function test_profile_information_can_be_updated()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
-            ->patch(route('profile.update'), [
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->patch(route('profile.update', [], false), [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
             ]);
@@ -45,11 +49,12 @@ class ProfileUpdateTest extends TestCase
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
-            ->patch(route('profile.update'), [
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->patch(route('profile.update', [], false), [
                 'name' => 'Test User',
                 'email' => $user->email,
             ]);
@@ -63,11 +68,12 @@ class ProfileUpdateTest extends TestCase
 
     public function test_user_can_delete_their_account()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
-            ->delete(route('profile.destroy'), [
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->delete(route('profile.destroy', [], false), [
                 'password' => 'password',
             ]);
 
@@ -81,12 +87,13 @@ class ProfileUpdateTest extends TestCase
 
     public function test_correct_password_must_be_provided_to_delete_account()
     {
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $response = $this
             ->actingAs($user)
+            ->withServerVariables($this->tenantRequestHeaders())
             ->from(route('profile.edit'))
-            ->delete(route('profile.destroy'), [
+            ->delete(route('profile.destroy', [], false), [
                 'password' => 'wrong-password',
             ]);
 

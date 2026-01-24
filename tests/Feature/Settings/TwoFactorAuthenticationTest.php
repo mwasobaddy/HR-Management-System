@@ -6,11 +6,13 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
-use Tests\TestCase;
+use Tests\TenantTestCase;
 
-class TwoFactorAuthenticationTest extends TestCase
+class TwoFactorAuthenticationTest extends TenantTestCase
 {
     use RefreshDatabase;
+
+    protected bool $tenancy = true;
 
     public function test_two_factor_settings_page_can_be_rendered()
     {
@@ -23,11 +25,12 @@ class TwoFactorAuthenticationTest extends TestCase
             'confirmPassword' => true,
         ]);
 
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $this->actingAs($user)
+            ->withServerVariables($this->tenantRequestHeaders())
             ->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('two-factor.show'))
+            ->get(route('two-factor.show', [], false))
             ->assertInertia(fn (Assert $page) => $page
                 ->component('settings/two-factor')
                 ->where('twoFactorEnabled', false)
@@ -40,7 +43,7 @@ class TwoFactorAuthenticationTest extends TestCase
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         Features::twoFactorAuthentication([
             'confirm' => true,
@@ -48,7 +51,8 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get(route('two-factor.show'));
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->get(route('two-factor.show', [], false));
 
         $response->assertRedirect(route('password.confirm'));
     }
@@ -59,7 +63,7 @@ class TwoFactorAuthenticationTest extends TestCase
             $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         Features::twoFactorAuthentication([
             'confirm' => true,
@@ -67,7 +71,8 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
 
         $this->actingAs($user)
-            ->get(route('two-factor.show'))
+            ->withServerVariables($this->tenantRequestHeaders())
+            ->get(route('two-factor.show', [], false))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('settings/two-factor')
@@ -82,11 +87,12 @@ class TwoFactorAuthenticationTest extends TestCase
 
         config(['fortify.features' => []]);
 
-        $user = User::factory()->create();
+        $user = User::factory()->forTenant($this->tenant)->create();
 
         $this->actingAs($user)
+            ->withServerVariables($this->tenantRequestHeaders())
             ->withSession(['auth.password_confirmed_at' => time()])
-            ->get(route('two-factor.show'))
+            ->get(route('two-factor.show', [], false))
             ->assertForbidden();
     }
 }
