@@ -25,7 +25,5 @@ foreach ($centralDomains as $index => $domain) {
         Route::post('/subscribe', [SubscriptionController::class, 'store'])
             ->middleware('throttle:3,1')
             ->name('subscribe.store');
-
-        require __DIR__.'/settings.php';
     });
 }

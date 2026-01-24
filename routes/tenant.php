@@ -26,6 +26,13 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
+    // Tenant root: redirect authenticated users to dashboard, guests to login
+    Route::get('/', function () {
+        return auth()->check()
+            ? redirect()->route('dashboard')
+            : redirect()->route('login');
+    })->name('tenant.home');
+
     // Direct login via signed URL (tenant domain)
     Route::get('/auth/login/{user_id}', [AuthController::class, 'login'])
         ->name('auth.login')
@@ -55,4 +62,6 @@ Route::middleware([
         Route::post('onboarding/complete', [OnboardingController::class, 'complete'])
             ->name('onboarding.complete');
     });
+
+    require __DIR__.'/settings.php';
 });
