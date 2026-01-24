@@ -39,6 +39,11 @@ class WelcomeCredentials extends Notification implements ShouldQueue
     {
         $loginUrl = $this->generateTenantSignedLoginUrl($notifiable);
 
+        $domain = $this->tenant->domains->first()->domain;
+        $port = app()->environment('local') ? ':8000' : '';
+        $req = app()->environment('local') ? 'http' : 'https';
+        $domain = "{$req}://{$domain}{$port}/login";
+
         return (new MailMessage)
             ->subject('Welcome to '.config('app.name').' - Your Account is Ready')
             ->greeting('Hello '.$notifiable->name.'!')
@@ -46,7 +51,7 @@ class WelcomeCredentials extends Notification implements ShouldQueue
             ->line('Here are your login credentials:')
             ->line('**Email:** '.$notifiable->email)
             ->line('**Password:** '.$this->password)
-            ->line('**Domain:** '.$this->tenant->domains()->first()?->domain)
+            ->line('**Domain:** '.$domain)
             ->line('Click the button below to log in to your account:')
             ->action('Log In to Your Account', $loginUrl)
             ->line('For security reasons, we recommend changing your password after your first login.')
