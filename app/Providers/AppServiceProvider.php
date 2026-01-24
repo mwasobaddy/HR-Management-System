@@ -48,6 +48,6 @@ class AppServiceProvider extends ServiceProvider
 
     protected function configureViewNamespaces(): void
     {
-        $this->loadViewsFrom(resource_path('views/errors'), 'errors');
+        $this->app['view']->addNamespace('errors', resource_path('views/errors'));
     }
 }
