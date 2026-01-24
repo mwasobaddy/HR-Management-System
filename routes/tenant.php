@@ -21,6 +21,15 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
+// Configure tenant identification failure handling
+InitializeTenancyByDomain::$onFail = function ($exception, $request, $next) {
+    // Get the central domain URL
+    $centralDomain = config('tenancy.central_domains')[0] ?? '127.0.0.1';
+    $port = app()->environment('local') ? ':8000' : '';
+
+    return redirect("http://{$centralDomain}{$port}/tenant-not-found");
+};
+
 Route::middleware([
     'web',
     InitializeTenancyByDomain::class,
@@ -28,9 +37,16 @@ Route::middleware([
 ])->group(function () {
     // Tenant root: redirect authenticated users to dashboard, guests to login
     Route::get('/', function () {
-        return auth()->check()
-            ? redirect()->route('dashboard')
-            : redirect()->route('login');
+        if (auth()->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        // Redirect to central domain login page
+        $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
+        $port = request()->getPort() !== 80 && request()->getPort() !== 443 ? ':'.request()->getPort() : '';
+        $scheme = request()->getScheme();
+
+        return redirect("{$scheme}://{$centralDomain}{$port}/login");
     })->name('tenant.home');
 
     // Direct login via signed URL (tenant domain)

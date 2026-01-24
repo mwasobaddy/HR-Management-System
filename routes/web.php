@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TenantNotFoundController;
 use App\Http\Controllers\Unauth\PublicController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,9 @@ foreach ($centralDomains as $index => $domain) {
         Route::get('/pricing', [PublicController::class, 'pricing'])->name('pricing');
         Route::get('/demo', [PublicController::class, 'demo'])->name('demo');
         Route::get('/support', [PublicController::class, 'support'])->name('support');
+
+        // Tenant not found page
+        Route::get('/tenant-not-found', [TenantNotFoundController::class, 'show'])->name('tenant.not.found');
 
         // Subscription flow (public)
         Route::get('/subscribe', [SubscriptionController::class, 'show'])->name('subscribe');
