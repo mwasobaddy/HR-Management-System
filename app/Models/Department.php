@@ -2,12 +2,20 @@
 
 namespace App\Models;
 
+use App\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
-use Stancl\Tenancy\Database\Concerns\BelongsToTenant;
 
 class Department extends Model
 {
     use BelongsToTenant;
+
+    /**
+     * Get the name of the tenant ID column.
+     */
+    public function getTenantIdColumn(): string
+    {
+        return 'tenant_id';
+    }
 
     protected $fillable = [
         'tenant_id',
