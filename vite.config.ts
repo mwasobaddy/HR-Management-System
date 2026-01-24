@@ -28,13 +28,13 @@ export default defineConfig({
         host: true,
         cors: {
             origin: [
-                /^https?:\/\/(.+\.)?hrm\.com(:\d+)?$/,
+                /^https?:\/\/(.+\.)?lvh\.me(:\d+)?$/,
                 /^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/,
             ],
             credentials: true,
         },
         hmr: {
-            host: 'hrm.com',
+            host: 'lvh.me',
             protocol: 'ws',
         },
     },
