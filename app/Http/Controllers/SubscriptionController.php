@@ -56,7 +56,8 @@ class SubscriptionController extends Controller
         try {
             $tenant = $this->tenantService->createTenant($validated);
 
-            return redirect('/login')->with('success', 'Account created! Check your email for login instructions.');
+            return redirect('/login')
+                ->with('success', 'Account created! Check your email for login instructions.');
 
         } catch (\Exception $e) {
             // Log the error for debugging, but use warning level for expected business errors
